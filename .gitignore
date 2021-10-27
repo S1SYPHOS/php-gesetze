@@ -1,0 +1,12 @@
+# Composer
+/vendor
+/composer.lock
+
+# Scraping
+/laws/*
+!/laws/main.py
+!/laws/data.json
+!/laws/requirements.txt
+
+# Cache
+*.cache
