@@ -28,10 +28,11 @@ class GesetzeImInternet
      *
      * Possible values:
      *
-     * 'min' => short title
-     * 'max' => long title
+     * 'light'  => abbreviated law (eg 'GG')
+     * 'normal' => complete law (eg 'Grundgesetz')
+     * 'full'   => official heading (eg '§ 433 Vertragstypische Pflichten beim Kaufvertrag')
      *
-     * @var mixed
+     * @var mixed string|false
      */
     public $title = false;
 
@@ -182,12 +183,16 @@ class GesetzeImInternet
         # TODO: Add option for extended description
         $title = '';
 
-        if ($this->title === 'min') {
+        if ($this->title === 'light') {
             $title = 'title="' . $law['law'] . '"';
         }
 
-        if ($this->title === 'max') {
+        if ($this->title === 'normal') {
             $title = 'title="' . $law['title'] . '"';
+        }
+
+        if ($this->title === 'full') {
+            $title = 'title="' . $law['headings'][$norm] . '"';
         }
 
         # Merge (existing) attributes
