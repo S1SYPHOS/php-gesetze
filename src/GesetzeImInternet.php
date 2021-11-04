@@ -59,7 +59,7 @@ class GesetzeImInternet
      *
      * 'light'  => abbreviated law (eg 'GG')
      * 'normal' => complete law (eg 'Grundgesetz')
-     * 'full'   => official heading (eg '§ 433 Vertragstypische Pflichten beim Kaufvertrag')
+     * 'full'   => official heading (eg 'Art 45d Parlamentarisches Kontrollgremium')
      *
      * @var mixed string|false
      */
@@ -130,6 +130,16 @@ class GesetzeImInternet
         }
 
         return (string) $result;
+    }
+
+
+    public static function analyze(string $string): array
+    {
+        if (preg_match(self::$pattern, $string, $matches)) {
+            return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+        }
+
+        return [];
     }
 
 
