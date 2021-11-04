@@ -48,7 +48,7 @@ class GesetzeImInternet
         . '(?:lit\.\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
         . '.{0,10}?'                                             # character limit
         . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)' # law ('Gesetz')
-        . '/i';
+        . '/';
 
 
     /**
@@ -95,12 +95,9 @@ class GesetzeImInternet
 
     public static function roman2arabic(string $string): string
     {
-        if (!preg_match('/[IVX]+/i', $string)) {
+        if (!preg_match('/[IVX]+/', $string)) {
             return $string;
         }
-
-        # Ensure uppercase
-        $string = strtoupper($string);
 
         # See https://stackoverflow.com/a/6266158
         $romans = [
