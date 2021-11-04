@@ -33,8 +33,23 @@ class GesetzeImInternet
 
     /**
      * The regex, holding the world together in its inmost folds
+     *
+     * For reference:
+     *
+     * '/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i'
      */
-    public static $pattern = '/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i';
+    public static $pattern = ''
+        . '/'
+        . '(§+|Art|Artikel)\.?\s*'                               # section sign
+        . '(?<norm>\d+(?:\w\b)?)\s*'                             # section ('Norm')
+        . '(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*'  # subsection ('Absatz')
+        . '(?:S\.\s*(?<satz>\d+))?\s*'                           # sentence ('Satz')
+        . '(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*'                   # number ('Nummer')
+        . '(?:lit\.\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
+        . '.{0,10}?'                                             # character limit
+        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z]'                      # law ('Gesetz')
+        . '(?:(?<buch>(?:\s|\b)[XIV]+)?))'                       # book ('Buch')
+        . '/i';
 
 
     /**
