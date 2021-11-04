@@ -47,8 +47,7 @@ class GesetzeImInternet
         . '(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*'                   # number ('Nummer')
         . '(?:lit\.\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
         . '.{0,10}?'                                             # character limit
-        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z]'                      # law ('Gesetz')
-        . '(?:(?<buch>(?:\s|\b)[XIV]+)?))'                       # book ('Buch')
+        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)' # law ('Gesetz')
         . '/i';
 
 
