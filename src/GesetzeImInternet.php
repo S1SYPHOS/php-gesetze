@@ -40,12 +40,12 @@ class GesetzeImInternet
      */
     public static $pattern = ''
         . '/'
-        . '(§+|Art|Artikel)\.?\s*'                               # section sign
+        . '(§+|Art\.?|Artikel)\s*'                               # section sign
         . '(?<norm>\d+(?:\w\b)?)\s*'                             # section ('Norm')
-        . '(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*'  # subsection ('Absatz')
-        . '(?:S\.\s*(?<satz>\d+))?\s*'                           # sentence ('Satz')
-        . '(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*'                   # number ('Nummer')
-        . '(?:lit\.\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
+        . '(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*'  # subsection ('Absatz')
+        . '(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*'                           # sentence ('Satz')
+        . '(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*'                   # number ('Nummer')
+        . '(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
         . '.{0,10}?'                                             # character limit
         . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)' # law ('Gesetz')
         . '/';
@@ -139,7 +139,7 @@ class GesetzeImInternet
     }
 
 
-    public static function extract(string $text, bool $roman2arabic = true): array
+    public static function extract(string $text, bool $roman2arabic = false): array
     {
         # TODO: Replace named capturing groups:
         # - `norm`
