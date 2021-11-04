@@ -36,18 +36,28 @@ class GesetzeImInternet
      *
      * For reference:
      *
-     * '/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i'
+     * '/(§+|Art\.?|Artikel)\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
      */
     public static $pattern = ''
+        # Start
         . '/'
-        . '(§+|Art\.?|Artikel)\s*'                               # section sign
-        . '(?<norm>\d+(?:\w\b)?)\s*'                             # section ('Norm')
-        . '(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*'  # subsection ('Absatz')
-        . '(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*'                           # sentence ('Satz')
-        . '(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*'                   # number ('Nummer')
-        . '(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?'                          # letter ('Litera')
-        . '.{0,10}?'                                             # character limit
-        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)' # law ('Gesetz')
+        # Section sign
+        . '(§+|Art\.?|Artikel)\s*'
+        # Section ('Norm')
+        . '(?<norm>\d+(?:\w\b)?)\s*'
+        # Subsection ('Absatz')
+        . '(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*'
+        # Sentence ('Satz')
+        . '(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*'
+        # Number ('Nummer')
+        . '(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*'
+        # Letter ('Litera')
+        . '(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?'
+        # Character limit
+        . '.{0,10}?'
+        # Law ('Gesetz')
+        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)'
+        # End
         . '/';
 
 
