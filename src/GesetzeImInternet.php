@@ -154,16 +154,6 @@ class GesetzeImInternet
     }
 
 
-    public static function analyze(string $string): array
-    {
-        if (preg_match(self::$pattern, $string, $matches)) {
-            return array_combine(self::$groups, array_slice($matches, 1));
-        }
-
-        return [];
-    }
-
-
     public static function extract(string $text, bool $roman2arabic = false): array
     {
         # Look for legal norms in text
