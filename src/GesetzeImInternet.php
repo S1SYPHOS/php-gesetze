@@ -4,7 +4,7 @@
  *
  * @link https://github.com/S1SYPHOS/php-gesetze
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- * @version 0.1.0
+ * @version 0.2.0
  */
 
 namespace S1SYPHOS;
@@ -83,7 +83,7 @@ class GesetzeImInternet
      *
      * 'light'  => abbreviated law (eg 'GG')
      * 'normal' => complete law (eg 'Grundgesetz')
-     * 'full'   => official heading (eg '§ 433 Vertragstypische Pflichten beim Kaufvertrag')
+     * 'full'   => official heading (eg 'Art 45d Parlamentarisches Kontrollgremium')
      *
      * @var mixed string|false
      */
