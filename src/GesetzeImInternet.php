@@ -36,29 +36,44 @@ class GesetzeImInternet
      *
      * For reference:
      *
-     * '/(§+|Art\.?|Artikel)\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
+     * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
      */
     public static $pattern = ''
         # Start
         . '/'
         # Section sign
-        . '(§+|Art\.?|Artikel)\s*'
+        . '(?:§+|Art\.?|Artikel)\s*'
         # Section ('Norm')
-        . '(?<norm>\d+(?:\w\b)?)\s*'
+        . '(\d+(?:\w\b)?)\s*'
         # Subsection ('Absatz')
-        . '(?:(?:Abs(?:atz|\.)\s*)?(?<absatz>(?:\d+|[XIV]+)(?:\w\b)?))?\s*'
+        . '(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*'
         # Sentence ('Satz')
-        . '(?:(?:S\.|Satz)\s*(?<satz>\d+))?\s*'
+        . '(?:(?:S\.|Satz)\s*(\d+))?\s*'
         # Number ('Nummer')
-        . '(?:(?:Nr\.|Nummer)\s*(?<nr>\d+(?:\w\b)?))?\s*'
+        . '(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*'
         # Letter ('Litera')
-        . '(?:(?:lit\.|litera)\s*(?<lit>[a-z]?))?'
+        . '(?:(?:lit\.|litera)\s*([a-z]?))?'
         # Character limit
         . '.{0,10}?'
         # Law ('Gesetz')
-        . '(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)'
+        . '(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)'
         # End
         . '/';
+
+
+    /**
+     * Group names
+     *
+     * @var array
+     */
+    public static $groups = [
+        'norm',
+        'absatz',
+        'satz',
+        'nr',
+        'lit',
+        'gesetz',
+    ];
 
 
     /**
@@ -142,7 +157,7 @@ class GesetzeImInternet
     public static function analyze(string $string): array
     {
         if (preg_match(self::$pattern, $string, $matches)) {
-            return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+            return array_combine(self::$groups, array_slice($matches, 1));
         }
 
         return [];
@@ -151,14 +166,7 @@ class GesetzeImInternet
 
     public static function extract(string $text, bool $roman2arabic = false): array
     {
-        # TODO: Replace named capturing groups:
-        # - `norm`
-        # - `absatz`
-        # - `satz`
-        # - `nr`
-        # - `lit`
-        # - `gesetz`
-        # - `buch`
+        # Look for legal norms in text
         if (preg_match_all(self::$pattern, $text, $matches)) {
             # Create data array
             $data = [];
@@ -166,8 +174,8 @@ class GesetzeImInternet
             foreach ($matches[0] as $index => $match) {
                 $array = [];
 
-                foreach (array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY) as $part => $results) {
-                    $array[$part] = $results[$index];
+                foreach (array_slice($matches, 1) as $i => $results) {
+                    $array[self::$groups[$i]] = $results[$index];
                 }
 
                 if ($roman2arabic) {
