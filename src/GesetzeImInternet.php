@@ -33,8 +33,47 @@ class GesetzeImInternet
 
     /**
      * The regex, holding the world together in its inmost folds
+     *
+     * For reference:
+     *
+     * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
      */
-    public static $pattern = '/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i';
+    public static $pattern = ''
+        # Start
+        . '/'
+        # Section sign
+        . '(?:§+|Art\.?|Artikel)\s*'
+        # Section ('Norm')
+        . '(\d+(?:\w\b)?)\s*'
+        # Subsection ('Absatz')
+        . '(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*'
+        # Sentence ('Satz')
+        . '(?:(?:S\.|Satz)\s*(\d+))?\s*'
+        # Number ('Nummer')
+        . '(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*'
+        # Letter ('Litera')
+        . '(?:(?:lit\.|litera)\s*([a-z]?))?'
+        # Character limit
+        . '.{0,10}?'
+        # Law ('Gesetz')
+        . '(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)'
+        # End
+        . '/';
+
+
+    /**
+     * Group names
+     *
+     * @var array
+     */
+    public static $groups = [
+        'norm',
+        'absatz',
+        'satz',
+        'nr',
+        'lit',
+        'gesetz',
+    ];
 
 
     /**
@@ -81,12 +120,9 @@ class GesetzeImInternet
 
     public static function roman2arabic(string $string): string
     {
-        if (!preg_match('/[IVX]+/i', $string)) {
+        if (!preg_match('/[IVX]+/', $string)) {
             return $string;
         }
-
-        # Ensure uppercase
-        $string = strtoupper($string);
 
         # See https://stackoverflow.com/a/6266158
         $romans = [
@@ -118,16 +154,19 @@ class GesetzeImInternet
     }
 
 
-    public static function extract(string $text, bool $roman2arabic = true): array
+    public static function analyze(string $string): array
     {
-        # TODO: Replace named capturing groups:
-        # - `norm`
-        # - `absatz`
-        # - `satz`
-        # - `nr`
-        # - `lit`
-        # - `gesetz`
-        # - `buch`
+        if (preg_match(self::$pattern, $string, $matches)) {
+            return array_combine(self::$groups, array_slice($matches, 1));
+        }
+
+        return [];
+    }
+
+
+    public static function extract(string $text, bool $roman2arabic = false): array
+    {
+        # Look for legal norms in text
         if (preg_match_all(self::$pattern, $text, $matches)) {
             # Create data array
             $data = [];
@@ -135,8 +174,8 @@ class GesetzeImInternet
             foreach ($matches[0] as $index => $match) {
                 $array = [];
 
-                foreach (array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY) as $part => $results) {
-                    $array[$part] = $results[$index];
+                foreach (array_slice($matches, 1) as $i => $results) {
+                    $array[self::$groups[$i]] = $results[$index];
                 }
 
                 if ($roman2arabic) {
