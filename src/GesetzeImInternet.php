@@ -24,14 +24,29 @@ class GesetzeImInternet
      */
 
     /**
+     * Available laws
+     *
+     * @var array
+     */
+    public $library;
+
+
+    /**
+     * The regex, holding the world together in its inmost folds
+     */
+    public static $pattern = '/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)?))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i';
+
+
+    /**
      * Controls `title` attribute
      *
      * Possible values:
      *
-     * 'min' => short title
-     * 'max' => long title
+     * 'light'  => abbreviated law (eg 'GG')
+     * 'normal' => complete law (eg 'Grundgesetz')
+     * 'full'   => official heading (eg '§ 433 Vertragstypische Pflichten beim Kaufvertrag')
      *
-     * @var mixed
+     * @var mixed string|false
      */
     public $title = false;
 
@@ -46,9 +61,18 @@ class GesetzeImInternet
 
     /**
      * Constructor
+     *
+     * @param string $file Path to data file
+     * @return void
      */
+    public function __construct(string $file = null)
+    {
+        # Determine library file
+        $file = $file ?? __DIR__ . '/../laws/data.json';
 
-    public function __construct() {}
+        # Load law library data
+        $this->library = json_decode(file_get_contents($file), true);
+    }
 
 
     /**
@@ -104,7 +128,7 @@ class GesetzeImInternet
         # - `lit`
         # - `gesetz`
         # - `buch`
-        if (preg_match_all('/(§+|Art|Artikel)\.?\s*(?<norm>\d+(?:\w\b)?)\s*(?:(?:Abs\.\s*)?(?<absatz>\d+|[XIV]+(?:\w\b)))?\s*(?:S\.\s*(?<satz>\d+))?\s*(?:Nr\.\s*(?<nr>\d+(?:\w\b)?))?\s*(?:lit\.\s*(?<lit>[a-z]?))?.{0,10}?(?<gesetz>\b[A-Z][A-Za-z]*[A-Z](?:(?<buch>(?:\s|\b)[XIV]+)?))/i', $text, $matches)) {
+        if (preg_match_all(self::$pattern, $text, $matches)) {
             # Create data array
             $data = [];
 
@@ -120,8 +144,8 @@ class GesetzeImInternet
                 }
 
                 $data[] = [
-                    'match' => $match,
-                    'parts' => $array,
+                    'full' => $match,
+                    'meta' => $array,
                 ];
             }
 
@@ -134,30 +158,62 @@ class GesetzeImInternet
 
     public function linkify(string $text): string
     {
-        $data = self::extract($text);
+        # Extract matching legal norms
+        $matches = self::extract($text);
 
-        if (empty($data)) {
+        # If none were found ..
+        if (empty($matches)) {
+            # .. return original text
             return $text;
         }
 
-        $laws = json_decode(file_get_contents(__DIR__ . '/../laws/data.json'), true);
+        # Iterate over matches
+        foreach ($matches as $match) {
+            # Get lowercase identifier for current law
+            $identifier = strtolower($match['meta']['gesetz']);
 
-        foreach ($data as $item) {
-            $identifier = strtolower($item['parts']['gesetz']);
-
-            if (in_array($identifier, array_keys($laws)) === true) {
-                $replacement = $this->buildLink($identifier, $item, $laws[$identifier]);
-
-                $text = str_replace($item['match'], $replacement, $text);
+            # Check whether current law exists in library ..
+            if (in_array($identifier, array_keys($this->library)) === false) {
+                # .. otherwise proceed to next match
+                continue;
             }
+
+            # Create `a` tag from matched legal norm
+            $link = $this->buildLink($identifier, $match);
+
+            # If they are the same though ..
+            if ($link === $match) {
+                # .. proceed to next match
+                continue;
+            }
+
+            # Replace matched legal norm with its `a` tag
+            $text = str_replace($match['full'], $link, $text);
         }
 
         return $text;
     }
 
 
-    protected function buildLink(string $identifier, array $item, array $law): string
+    protected function buildLink(string $identifier, array $match): string
     {
+        # Get data about current law
+        $law = $this->library[$identifier];
+
+        # Since `norm` is always a string ..
+        $norm = $match['meta']['norm'];
+
+        # .. but PHP decodes JSON numeric keys as integer ..
+        if (preg_match('/\b\d+\b/', $norm)) {
+            # .. convert them first
+            $norm = (int)$norm;
+        }
+
+        # Fail early for invalid norms
+        if (in_array($norm, array_map('strval', array_keys($law['headings']))) === false) {
+            return $match['full'];
+        }
+
         # Build `class` attribute
         $class = '';
 
@@ -167,12 +223,12 @@ class GesetzeImInternet
 
         # Build `href` attribute
         # (1) Set default HTML file
-        $file = '__' . $item['parts']['norm'] . '.html';
+        $file = '__' . $match['meta']['norm'] . '.html';
 
         # (2) Except for the 'Grundgesetz' ..
         if ($identifier === 'gg') {
             # .. which is different
-            $file = 'art_' . $item['parts']['norm'] . '.html';
+            $file = 'art_' . $match['meta']['norm'] . '.html';
         }
 
         # (3) Combine everything
@@ -182,17 +238,21 @@ class GesetzeImInternet
         # TODO: Add option for extended description
         $title = '';
 
-        if ($this->title === 'min') {
+        if ($this->title === 'light') {
             $title = 'title="' . $law['law'] . '"';
         }
 
-        if ($this->title === 'max') {
+        if ($this->title === 'normal') {
             $title = 'title="' . $law['title'] . '"';
+        }
+
+        if ($this->title === 'full') {
+            $title = 'title="' . $law['headings'][$norm] . '"';
         }
 
         # Merge (existing) attributes
         $attributes = array_filter([$class, $href, $title]);
 
-        return '<a ' . implode(' ', $attributes) . '>' . $item['match'] . '</a>';
+        return '<a ' . implode(' ', $attributes) . '>' . $match['full'] . '</a>';
     }
 }
