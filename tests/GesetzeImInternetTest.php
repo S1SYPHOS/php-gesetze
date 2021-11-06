@@ -41,8 +41,10 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
         # Insert test string
         $text .= '<div>';
         $text .= 'This is a <strong>simple</strong> HTML text.';
-        $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG.';
+        $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
         $text .= '.. or § 433 II BGB!';
+        $text .= 'At the same time, there are invalid ones, like ..';
+        $text .= '§ 1a BGB and § 1 GGGG';
         $text .= '</div>';
 
         self::$text = $text;
@@ -284,7 +286,15 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
 
         # (2) Norms
         $norms = [
-            # Section
+            # Note: Despite using a section sign instead of 'Art(ikel)', this works!
+            '§ 1 GG'   => [
+                'norm' => '1',
+                'absatz' => '',
+                'satz' => '',
+                'nr' => '',
+                'lit' => '',
+                'gesetz' => 'GG',
+            ],
             '§ 1 BGB' => [
                 'norm' => '1',
                 'absatz' => '',
@@ -301,7 +311,27 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals([[
                 'full' => $full,
                 'meta' => $meta,
-            ]], $object::extract($full));
+            ]], $object->extract($full));
+        }
+    }
+
+
+    public function testInvalidExtract(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\GesetzeImInternet();
+
+        # (2) Norms
+        $norms = [
+            '§ 1a BGB' => [],
+            '§ 1 GGGG' => [],
+        ];
+
+        # Run function
+        foreach ($norms as $norm => $expected) {
+            # Assert result
+            $this->assertEquals($expected, $object->extract($norm));
         }
     }
 
@@ -328,5 +358,15 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertEquals(2, count($result));
+
+        # Change condition `validate`
+        $object->validate = false;
+
+        # Run function
+        @$dom->loadHTML($object->linkify(self::$text));
+        $result = $dom->getElementsByTagName('a');
+
+        # Assert result
+        $this->assertEquals(4, count($result));
     }
 }
