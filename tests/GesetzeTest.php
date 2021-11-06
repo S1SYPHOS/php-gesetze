@@ -1,21 +1,14 @@
 <?php
 
-/**
- * Testing GesetzeImInternet - Linking texts with gesetze-im-internet.de, no fuss
- *
- * @link https://github.com/S1SYPHOS/php-gesetze
- * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- */
-
-namespace S1SYPHOS\Tests;
+namespace S1SYPHOS\Gesetze\Tests;
 
 
 /**
- * Class GesetzeImInternetTest
+ * Class GesetzTest
  *
- * @package php-gesetze
+ * Adds tests for class `Gesetz`
  */
-class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
+class GesetzTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Properties
@@ -59,7 +52,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -282,7 +275,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -320,7 +313,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -340,7 +333,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) HTML document
         $dom = new \DOMDocument;
