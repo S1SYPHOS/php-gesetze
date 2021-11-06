@@ -232,6 +232,22 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
                 'lit' => 'a',
                 'gesetz' => 'BGB',
             ],
+            '§ 1 Buchstabe a BGB' => [
+                'norm' => '1',
+                'absatz' => '',
+                'satz' => '',
+                'nr' => '',
+                'lit' => 'a',
+                'gesetz' => 'BGB',
+            ],
+            '§ 1 Buchst. a BGB' => [
+                'norm' => '1',
+                'absatz' => '',
+                'satz' => '',
+                'nr' => '',
+                'lit' => 'a',
+                'gesetz' => 'BGB',
+            ],
 
             # Law
             '§ 1 BGB' => [

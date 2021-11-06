@@ -52,7 +52,7 @@ class GesetzeImInternet
         # Number ('Nummer')
         . '(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*'
         # Letter ('Litera')
-        . '(?:(?:lit\.|litera)\s*([a-z]?))?'
+        . '(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?'
         # Character limit
         . '.{0,10}?'
         # Law ('Gesetz')
