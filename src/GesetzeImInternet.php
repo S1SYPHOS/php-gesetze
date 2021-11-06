@@ -126,6 +126,12 @@ class GesetzeImInternet
      * Methods
      */
 
+    /**
+     * Converts roman numerals to arabic numerals
+     *
+     * @param string $string
+     * @return string
+     */
     public static function roman2arabic(string $string): string
     {
         if (!preg_match('/[IVX]+/', $string)) {
@@ -162,6 +168,12 @@ class GesetzeImInternet
     }
 
 
+    /**
+     * Analyzes a single legal norm
+     *
+     * @param string $string Legal norm
+     * @return array Formatted regex match
+     */
     public static function analyze(string $string): array
     {
         if (preg_match(self::$pattern, $string, $matches)) {
@@ -172,10 +184,16 @@ class GesetzeImInternet
     }
 
 
-    protected function validate(array $data): bool
+    /**
+     * Validates a single legal norm
+     *
+     * @param array $array Formatted regex match
+     * @return bool Validity of legal norm
+     */
+    protected function validate(array $array): bool
     {
         # Get lowercase identifier for current law
-        $identifier = strtolower($data['gesetz']);
+        $identifier = strtolower($array['gesetz']);
 
         # Check whether current law exists in library ..
         if (!isset($this->library[$identifier])) {
@@ -187,7 +205,7 @@ class GesetzeImInternet
         $law = $this->library[$identifier];
 
         # Since `norm` is always a string ..
-        $norm = $data['norm'];
+        $norm = $array['norm'];
 
         # .. but PHP decodes JSON numeric keys as integer ..
         if (preg_match('/\b\d+\b/', $norm)) {
@@ -199,10 +217,16 @@ class GesetzeImInternet
     }
 
 
-    public function extract(string $text, bool $roman2arabic = false): array
+    /**
+     * Extracts legal norms from text
+     *
+     * @param string $string Text
+     * @return array Formatted regex matches
+     */
+    public function extract(string $string, bool $roman2arabic = false): array
     {
         # Look for legal norms in text
-        if (preg_match_all(self::$pattern, $text, $matches)) {
+        if (preg_match_all(self::$pattern, $string, $matches)) {
             # Create data array
             $data = [];
 
@@ -235,15 +259,21 @@ class GesetzeImInternet
     }
 
 
-    public function linkify(string $text): string
+    /**
+     * Links legal norms of a text to 'gesetze-im-internet.de'
+     *
+     * @param string $string Unprocessed text
+     * @return string Processed text
+     */
+    public function linkify(string $string): string
     {
         # Extract matching legal norms
-        $matches = self::extract($text);
+        $matches = $this->extract($string);
 
         # If none were found ..
         if (empty($matches)) {
             # .. return original text
-            return $text;
+            return $string;
         }
 
         # Iterate over matches
@@ -257,14 +287,20 @@ class GesetzeImInternet
             $link = $this->buildLink($match);
 
             # Replace matched legal norm with its `a` tag
-            $text = str_replace($match['full'], $link, $text);
+            $string = str_replace($match['full'], $link, $string);
         }
 
-        return $text;
+        return $string;
     }
 
 
-    protected function buildLink(array $match): string
+    /**
+     * Builds link for legal norm to 'gesetze-im-internet.de'
+     *
+     * @param array $array Formatted regex match
+     * @return string Generated `a` tag
+     */
+    protected function buildLink(array $array): string
     {
         # Set defaults
         $attributes = $this->attributes;
@@ -274,12 +310,12 @@ class GesetzeImInternet
         $url = 'https://www.gesetze-im-internet.de';
 
         # (2) Set default HTML file
-        $file = '__' . $match['meta']['norm'] . '.html';
+        $file = '__' . $array['meta']['norm'] . '.html';
 
         # (3) Except for the 'Grundgesetz' ..
-        if (strtolower($match['meta']['gesetz']) === 'gg') {
+        if (strtolower($array['meta']['gesetz']) === 'gg') {
             # .. which is different
-            $file = 'art_' . $match['meta']['norm'] . '.html';
+            $file = 'art_' . $array['meta']['norm'] . '.html';
         }
 
         # (4) Combine everything
@@ -310,6 +346,6 @@ class GesetzeImInternet
         }, array_keys($attributes), array_values($attributes));
 
         # (2) Party time!
-        return '<a ' . implode(' ', $attributes) . '>' . $match['full'] . '</a>';
+        return '<a ' . implode(' ', $attributes) . '>' . $array['full'] . '</a>';
     }
 }
