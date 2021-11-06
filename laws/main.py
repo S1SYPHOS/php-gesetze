@@ -4,8 +4,8 @@ import glob
 import json
 import time
 
-from urllib.request import urlopen
 from bs4 import BeautifulSoup as bs
+from requests import get as get_url
 
 
 path = os.path.dirname(__file__)
@@ -13,7 +13,7 @@ path = os.path.dirname(__file__)
 # Determine data files
 data_files = [path + '/{}.json'.format(char) for char in 'ABCDEFGHIJKLMNOPQRSTUVWYZ123456789']
 
-# Iterate over files ..
+# Iterate over files
 for data_file in data_files:
     # If data file already exists ..
     if os.path.exists(data_file):
@@ -23,10 +23,8 @@ for data_file in data_files:
     # Create data array
     data = {}
 
-    # .. fetching their respective overview pages
-    client = urlopen('https://www.gesetze-im-internet.de/Teilliste_{}.html'.format(os.path.basename(data_file)))
-    html = client.read()
-    client.close()
+    # Fetch overview page for category letter
+    html = get_url('https://www.gesetze-im-internet.de/Teilliste_{}.html'.format(os.path.basename(data_file))).text
 
     # Parse their HTML & iterate over `p` tags ..
     for link in bs(html, 'html.parser').select('#paddingLR12')[0].select('p'):
@@ -47,9 +45,7 @@ for data_file in data_files:
         }
 
         # Fetch index page for each law
-        client = urlopen('https://www.gesetze-im-internet.de/{}/index.html'.format(slug))
-        law_html = client.read()
-        client.close()
+        html = get_url('https://www.gesetze-im-internet.de/{}/index.html'.format(slug)).text
 
         # Iterate over `a` tags ..
         for heading in bs(law_html, 'html.parser').select('#paddingLR12')[0].select('td'):
