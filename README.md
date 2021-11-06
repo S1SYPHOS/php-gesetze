@@ -128,8 +128,8 @@ echo $text;
 # Result:
 #
 # <div>This is a <b>simple</b> HTML text.
-# It contains legal norms, like <a href="https://www.gesetze-im-internet.de/gg/art_12.html">Art. 12 I GG</a>.
-# .. or <a href="https://www.gesetze-im-internet.de/bgb/__433.html">§ 433 II nr. 2 BGB</a>!
+# It contains legal norms, like <a href="https://www.gesetze-im-internet.de/gg/art_12.html" target="_blank">Art. 12 I GG</a>.
+# .. or <a href="https://www.gesetze-im-internet.de/bgb/__433.html" target="_blank">§ 433 II nr. 2 BGB</a>!
 # </div>
 ```
 
