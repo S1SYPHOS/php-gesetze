@@ -14,8 +14,6 @@ $result = \S1SYPHOS\GesetzeImInternet::analyze('Art. 1 II GG');
 
 var_dump($result);
 
-# Result:
-#
 # array(6) {
 #   ["norm"]=>
 #   string(1) "1"
@@ -39,8 +37,6 @@ You may want to transform roman into arabic numerals, look no further: `roman2ar
 ```php
 echo \S1SYPHOS\GesetzeImInternet::roman2arabic('IX');
 
-# Result
-#
 # 9
 ```
 
@@ -51,8 +47,6 @@ $obj = new \S1SYPHOS\GesetzeImInternet;
 
 echo $obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG');
 
-# Result
-#
 # array(2) {
 #   [0]=>
 #   array(2) {
@@ -104,8 +98,6 @@ $obj = new \S1SYPHOS\GesetzeImInternet;
 
 echo $obj->linkify('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4c GG');
 
-# Result:
-#
 # This is a simple text, featuring <a href="https://www.gesetze-im-internet.de/bgb/__1.html" title="§ 1 Beginn der Rechtsfähigkeit">§ 1 I Nr. 1 BGB</a> as well as Art. 4c GG
 ```
 
@@ -142,3 +134,8 @@ This library is based on ..
 
 - .. an adapted (and somewhat improved) version of the [`jura_regex`](https://github.com/kiersch/jura_regex) regex package by Philipp Kiersch (originally written in Python).
 - .. an adapted (and somewhat modified) version of the [`gesetze`](https://github.com/matejgrahovac/gesetze) crawler package by Matej Grahovac (originally written in Python).
+
+
+## Special Thanks
+
+I'd like to thank everybody that's making free & open source software - you people are awesome. Also I'm always thankful for feedback and bug reports :)
