@@ -36,7 +36,7 @@ class GesetzeImInternet
      *
      * For reference:
      *
-     * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
+     * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
      */
     public static $pattern = ''
         # Start
@@ -96,6 +96,14 @@ class GesetzeImInternet
      * @var mixed string|false
      */
     public $title = false;
+
+
+    /**
+     * Defines whether laws & legal norms should be validated upon extracting / linking
+     *
+     * @var bool
+     */
+    public $validate = true;
 
 
     /**
@@ -164,7 +172,34 @@ class GesetzeImInternet
     }
 
 
-    public static function extract(string $text, bool $roman2arabic = false): array
+    protected function validate(array $data): bool
+    {
+        # Get lowercase identifier for current law
+        $identifier = strtolower($data['gesetz']);
+
+        # Check whether current law exists in library ..
+        if (!isset($this->library[$identifier])) {
+            # .. otherwise fail check
+            return false;
+        }
+
+        # Get data about current law
+        $law = $this->library[$identifier];
+
+        # Since `norm` is always a string ..
+        $norm = $data['norm'];
+
+        # .. but PHP decodes JSON numeric keys as integer ..
+        if (preg_match('/\b\d+\b/', $norm)) {
+            # .. convert them first
+            $norm = (int)$norm;
+        }
+
+        return in_array($norm, array_map('strval', array_keys($law['headings'])));
+    }
+
+
+    public function extract(string $text, bool $roman2arabic = false): array
     {
         # Look for legal norms in text
         if (preg_match_all(self::$pattern, $text, $matches)) {
@@ -176,6 +211,11 @@ class GesetzeImInternet
 
                 foreach (array_slice($matches, 1) as $i => $results) {
                     $array[self::$groups[$i]] = $results[$index];
+                }
+
+                # Block invalid laws & legal norms (if enabled)
+                if ($this->validate && !$this->validate($array)) {
+                    continue;
                 }
 
                 if ($roman2arabic) {
@@ -208,23 +248,13 @@ class GesetzeImInternet
 
         # Iterate over matches
         foreach ($matches as $match) {
-            # Get lowercase identifier for current law
-            $identifier = strtolower($match['meta']['gesetz']);
-
-            # Check whether current law exists in library ..
-            if (in_array($identifier, array_keys($this->library)) === false) {
-                # .. otherwise proceed to next match
+            # Block invalid laws & legal norms (if enabled)
+            if ($this->validate && !$this->validate($match['meta'])) {
                 continue;
             }
 
             # Create `a` tag from matched legal norm
-            $link = $this->buildLink($identifier, $match);
-
-            # If they are the same though ..
-            if ($link === $match) {
-                # .. proceed to next match
-                continue;
-            }
+            $link = $this->buildLink($match);
 
             # Replace matched legal norm with its `a` tag
             $text = str_replace($match['full'], $link, $text);
@@ -234,25 +264,8 @@ class GesetzeImInternet
     }
 
 
-    protected function buildLink(string $identifier, array $match): string
+    protected function buildLink(array $match): string
     {
-        # Get data about current law
-        $law = $this->library[$identifier];
-
-        # Since `norm` is always a string ..
-        $norm = $match['meta']['norm'];
-
-        # .. but PHP decodes JSON numeric keys as integer ..
-        if (preg_match('/\b\d+\b/', $norm)) {
-            # .. convert them first
-            $norm = (int)$norm;
-        }
-
-        # Fail early for invalid norms
-        if (in_array($norm, array_map('strval', array_keys($law['headings']))) === false) {
-            return $match['full'];
-        }
-
         # Set defaults
         $attributes = $this->attributes;
 
@@ -264,7 +277,7 @@ class GesetzeImInternet
         $file = '__' . $match['meta']['norm'] . '.html';
 
         # (3) Except for the 'Grundgesetz' ..
-        if ($identifier === 'gg') {
+        if (strtolower($match['meta']['gesetz']) === 'gg') {
             # .. which is different
             $file = 'art_' . $match['meta']['norm'] . '.html';
         }

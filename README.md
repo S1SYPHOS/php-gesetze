@@ -32,6 +32,8 @@ var_dump($result);
 # }
 ```
 
+**Note:** In contrast to `analyze`, all other function only match & link *existing* laws & legal norms!
+
 You may want to transform roman into arabic numerals, look no further: `roman2arabic` has got your back:
 
 ```php
@@ -45,7 +47,9 @@ echo \S1SYPHOS\GesetzeImInternet::roman2arabic('IX');
 Want to `extract` legal norms from a text? Here you go:
 
 ```php
-echo \S1SYPHOS\GesetzeImInternet::extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG');
+$obj = new \S1SYPHOS\GesetzeImInternet;
+
+echo $obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG');
 
 # Result
 #
@@ -104,8 +108,6 @@ echo $obj->linkify('This is a simple text, featuring § 1 I Nr. 1 BGB as well as
 #
 # This is a simple text, featuring <a href="https://www.gesetze-im-internet.de/bgb/__1.html" title="§ 1 Beginn der Rechtsfähigkeit">§ 1 I Nr. 1 BGB</a> as well as Art. 4c GG
 ```
-
-**Note:** As you can see, in contrast to `analyze` & `extract`, this function only matches & links existing legal norms!
 
 
 ## Example
