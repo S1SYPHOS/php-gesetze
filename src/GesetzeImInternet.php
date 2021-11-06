@@ -62,7 +62,7 @@ class GesetzeImInternet
 
 
     /**
-     * Group names
+     * Names for capturing groups
      *
      * @var array
      */
@@ -77,6 +77,14 @@ class GesetzeImInternet
 
 
     /**
+     * Defines HTML attributes
+     *
+     * @var array
+     */
+    public $attributes = [];
+
+
+    /**
      * Controls `title` attribute
      *
      * Possible values:
@@ -88,14 +96,6 @@ class GesetzeImInternet
      * @var mixed string|false
      */
     public $title = false;
-
-
-    /**
-     * Controls `class` attribute
-     *
-     * @var string
-     */
-    public $class = '';
 
 
     /**
@@ -253,45 +253,50 @@ class GesetzeImInternet
             return $match['full'];
         }
 
-        # Build `class` attribute
-        $class = '';
-
-        if (!empty($this->class)) {
-            $class = 'class="' . $this->class . '"';
-        }
+        # Set defaults
+        $attributes = $this->attributes;
 
         # Build `href` attribute
-        # (1) Set default HTML file
+        # (1) Set base URL
+        $url = 'https://www.gesetze-im-internet.de';
+
+        # (2) Set default HTML file
         $file = '__' . $match['meta']['norm'] . '.html';
 
-        # (2) Except for the 'Grundgesetz' ..
+        # (3) Except for the 'Grundgesetz' ..
         if ($identifier === 'gg') {
             # .. which is different
             $file = 'art_' . $match['meta']['norm'] . '.html';
         }
 
-        # (3) Combine everything
-        $href = sprintf('href="https://www.gesetze-im-internet.de/%s/%s"', $law['slug'], $file);
+        # (4) Combine everything
+        $attributes['href'] = sprintf('%s/%s/%s', $url, $law['slug'], $file);
 
         # Build `title` attribute
-        # TODO: Add option for extended description
-        $title = '';
-
         if ($this->title === 'light') {
-            $title = 'title="' . $law['law'] . '"';
+            $attributes['title'] = $law['law'];
         }
 
         if ($this->title === 'normal') {
-            $title = 'title="' . $law['title'] . '"';
+            $attributes['title'] = $law['title'];
         }
 
         if ($this->title === 'full') {
-            $title = 'title="' . $law['headings'][$norm] . '"';
+            $attributes['title'] = $law['headings'][$norm];
         }
 
-        # Merge (existing) attributes
-        $attributes = array_filter([$class, $href, $title]);
+        # Provide fallback for `target` attribute
+        if (!isset($attributes['target'])) {
+            $attributes['target'] = '_blank';
+        }
 
+        # Build `a` tag
+        # (1) Format key-value pairs
+        $attributes = array_map(function($key, $value) {
+            return sprintf('%s="%s"', $key, $value);
+        }, array_keys($attributes), array_values($attributes));
+
+        # (2) Party time!
         return '<a ' . implode(' ', $attributes) . '>' . $match['full'] . '</a>';
     }
 }
