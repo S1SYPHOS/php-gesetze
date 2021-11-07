@@ -27,7 +27,7 @@ class Gesetz
      *
      * @var array
      */
-    private $drivers = [
+    public $drivers = [
         'gesetze' => null,
         'dejure'  => null,
     ];
