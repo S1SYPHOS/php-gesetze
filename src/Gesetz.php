@@ -23,6 +23,16 @@ class Gesetz
      */
 
     /**
+     * Available providers
+     *
+     * @var array
+     */
+    private $drivers = [
+        'gesetze' => null,
+    ];
+
+
+    /**
      * The regex, holding the world together in its inmost folds
      *
      * For reference:
@@ -98,6 +108,42 @@ class Gesetz
 
 
     /**
+     * Constructor
+     *
+     * @param string $driver Provider identifier
+     * @return void
+     * @throws \Exception
+     */
+    public function __construct(string $driver = 'gesetze')
+    {
+        if (!array_key_exists($driver, $this->drivers)) {
+            throw new \Exception(sprintf('Invalid driver: "%s"', $driver));
+        }
+
+        # Move preferred driver to the beginning (if necessary)
+        if ($driver !== array_keys($this->drivers)[0]) {
+            # (1) Remove preference
+            unset($this->drivers[$driver]);
+
+            # (2) Readd at beginning
+            $this->drivers = array_merge([$driver => null], $this->drivers);
+        }
+
+        # Initialize drivers
+        array_walk($this->drivers, function(&$object, $driver) {
+            switch ($driver) {
+                case 'gesetze':
+                    $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet();
+            }
+
+            if (!isset($object)) {
+                throw new \Exception(sprintf('Coult not initialize driver: "%s"', $driver));
+            }
+        });
+    }
+
+
+    /**
      * Methods
      */
 
@@ -160,6 +206,34 @@ class Gesetz
 
 
     /**
+     * Validates a single legal norm (across all providers)
+     *
+     * @param array $array Formatted regex match
+     * @return bool Validity of legal norm
+     */
+    public function validate(array $array): bool
+    {
+        # Set default
+        $validity = false;
+
+        # Iterate over drivers ..
+        foreach ($this->drivers as $object) {
+            # .. validating legal norm
+            if ($object->validate($array)) {
+                # Upon first hit ..
+                # (1) .. affirm its validity
+                $validity = true;
+
+                # (2) .. abort the loop
+                break;
+            }
+        }
+
+        return $validity;
+    }
+
+
+    /**
      * Extracts legal norms from text
      *
      * @param string $string Text
@@ -172,8 +246,6 @@ class Gesetz
             # Create data array
             $data = [];
 
-            $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet;
-
             foreach ($matches[0] as $index => $match) {
                 $array = [];
 
@@ -182,7 +254,7 @@ class Gesetz
                 }
 
                 # Block invalid laws & legal norms (if enabled)
-                if ($this->validate && !$object->validate($array)) {
+                if ($this->validate && !$this->validate($array)) {
                     continue;
                 }
 
@@ -220,28 +292,35 @@ class Gesetz
             return $string;
         }
 
-        $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet;
-
         # Iterate over matches
         foreach ($matches as $match) {
-            # Block invalid laws & legal norms (if enabled)
-            if ($this->validate && !$object->validate($match['meta'])) {
-                continue;
+            foreach ($this->drivers as $object) {
+                # Block invalid laws & legal norms (if enabled)
+                if ($this->validate && !$object->validate($match['meta'])) {
+                    continue;
+                }
+
+                # Build `a` tag attributes
+                # (1) Set defaults
+                $attributes = $this->attributes;
+
+                # (2) Determine `href` attribute
+                $attributes['href'] = $object->buildURL($match['meta']);
+
+                # (3) Determine `title` attribute
+                $attributes['title'] = $object->buildTitle($match['meta'], $this->title);
+
+                # (4) Provide fallback for `target` attribute
+                if (!isset($attributes['target'])) {
+                    $attributes['target'] = '_blank';
+                }
+
+                # Abort the loop
+                break;
             }
 
-            # Build `a` tag attributes
-            # (1) Set defaults
-            $attributes = $this->attributes;
-
-            # (2) Determine `href` attribute
-            $attributes['href'] = $object->buildURL($match['meta']);
-
-            # (3) Determine `title` attribute
-            $attributes['title'] = $object->buildTitle($match['meta'], $this->title);
-
-            # (4) Provide fallback for `target` attribute
-            if (!isset($attributes['target'])) {
-                $attributes['target'] = '_blank';
+            if (!isset($attributes['href'])) {
+                continue;
             }
 
             # Build `a` tag

@@ -11,6 +11,10 @@ namespace S1SYPHOS\Gesetze\Drivers;
 abstract class Driver
 {
     /**
+     * Properties
+     */
+
+    /**
      * Individual identifier
      *
      * @var string
@@ -29,18 +33,26 @@ abstract class Driver
     /**
      * Constructor
      *
-     * @param string $file Path to data file
      * @return void
+     * @throws \Exception
      */
-    public function __construct(string $file = null)
+    public function __construct()
     {
-        # Determine library file
-        $file = $file ?? sprintf('%s/../../laws/%s.json', __DIR__, $this->identifier);
+        # Determine data file
+        $file = sprintf('%s/../../laws/%s.json', __DIR__, $this->identifier);
+
+        if (!file_exists($file)) {
+            throw new \Exception(sprintf('File does not exist: "%s"', realpath($file)));
+        }
 
         # Load law library data
         $this->library = json_decode(file_get_contents($file), true);
     }
 
+
+    /**
+     * Methods
+     */
 
     /**
      * Validates a single legal norm
