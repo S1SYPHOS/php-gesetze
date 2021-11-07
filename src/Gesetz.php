@@ -5,7 +5,7 @@
  *
  * @link https://github.com/S1SYPHOS/php-gesetze
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- * @version 0.2.0
+ * @version 0.3.0
  */
 
 namespace S1SYPHOS\Gesetze;
