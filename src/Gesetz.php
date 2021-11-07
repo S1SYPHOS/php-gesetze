@@ -28,8 +28,9 @@ class Gesetz
      * @var array
      */
     public $drivers = [
-        'gesetze' => null,
-        'dejure'  => null,
+        'gesetze'    => null,
+        'dejure'     => null,
+        'lexparency' => null,
     ];
 
 
@@ -142,6 +143,11 @@ class Gesetz
             # (2) 'dejure.org'
             if ($driver === 'dejure') {
                 $object = new \S1SYPHOS\Gesetze\Drivers\DejureOnline();
+            }
+
+            # (3) 'lexparency.de'
+            if ($driver === 'lexparency') {
+                $object = new \S1SYPHOS\Gesetze\Drivers\Lexparency();
             }
         });
     }
