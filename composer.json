@@ -3,7 +3,7 @@
     "description": "Linking texts with gesetze-im-internet.de, no fuss",
     "type": "library",
     "license": "GPL-3.0",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "keywords": ["api", "legal", "gesetze-im-internet", "bjm"],
     "homepage": "https://github.com/S1SYPHOS",
     "scripts": {
