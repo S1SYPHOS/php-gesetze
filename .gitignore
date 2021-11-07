@@ -3,10 +3,8 @@
 /composer.lock
 
 # Scraping
-/laws/*
-!/laws/main.py
-!/laws/data.json
-!/laws/requirements.txt
+/laws/dejure
+/laws/gesetze
 
 # Cache
 *.cache
