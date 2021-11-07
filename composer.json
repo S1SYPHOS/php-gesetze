@@ -1,6 +1,6 @@
 {
     "name": "s1syphos/php-gesetze",
-    "description": "Linking texts with gesetze-im-internet.de, no fuss",
+    "description": "Linking german legal norms, dependency-free & GDPR-friendly",
     "type": "library",
     "license": "GPL-3.0",
     "version": "0.3.0",

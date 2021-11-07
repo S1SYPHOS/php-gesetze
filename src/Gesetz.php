@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Linking german legal norms, no fuss.
+ * Linking german legal norms, dependency-free & GDPR-friendly.
  *
  * @link https://github.com/S1SYPHOS/php-gesetze
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
@@ -285,7 +285,7 @@ class Gesetz
 
 
     /**
-     * Links legal norms of a text to 'gesetze-im-internet.de'
+     * Transforms legal references into HTML link tags
      *
      * @param string $string Unprocessed text
      * @return string Processed text
