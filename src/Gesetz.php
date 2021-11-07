@@ -140,7 +140,7 @@ class Gesetz
             }
 
             # (2) 'dejure.org'
-            if ($driver === 'gesetze') {
+            if ($driver === 'dejure') {
                 $object = new \S1SYPHOS\Gesetze\Drivers\DejureOnline();
             }
         });

@@ -11,12 +11,20 @@ namespace S1SYPHOS\Gesetze\Drivers;
 class GesetzeImInternet extends Driver
 {
     /**
+     * Properties
+     */
+
+    /**
      * Individual identifier
      *
      * @var string
      */
     protected $identifier = 'gesetze';
 
+
+    /**
+     * Methods
+     */
 
     /**
      * Builds URL for corresponding legal norm

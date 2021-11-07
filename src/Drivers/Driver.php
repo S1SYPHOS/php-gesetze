@@ -27,7 +27,7 @@ abstract class Driver
      *
      * @var array
      */
-    private $library;
+    protected $library;
 
 
     /**
