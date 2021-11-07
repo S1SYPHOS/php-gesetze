@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "S1SYPHOS\\": "src/"
+            "S1SYPHOS\\Gesetze\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "S1SYPHOS\\Tests\\": "tests/"
+            "S1SYPHOS\\Gesetze\\Tests\\": "tests/"
         }
     }
 }

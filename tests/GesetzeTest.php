@@ -1,21 +1,14 @@
 <?php
 
-/**
- * Testing GesetzeImInternet - Linking texts with gesetze-im-internet.de, no fuss
- *
- * @link https://github.com/S1SYPHOS/php-gesetze
- * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- */
-
-namespace S1SYPHOS\Tests;
+namespace S1SYPHOS\Gesetze\Tests;
 
 
 /**
- * Class GesetzeImInternetTest
+ * Class GesetzTest
  *
- * @package php-gesetze
+ * Adds tests for class `Gesetz`
  */
-class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
+class GesetzTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Properties
@@ -55,11 +48,55 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
+    public function testValidDriver(): void
+    {
+        # Setup
+        # (1) Providers
+        $drivers = [
+            'gesetze' => '\S1SYPHOS\Gesetze\Drivers\GesetzeImInternet',
+            'dejure' => '\S1SYPHOS\Gesetze\Drivers\DejureOnline',
+        ];
+
+        foreach ($drivers as $driver => $className) {
+            # Run function
+            $result = new \S1SYPHOS\Gesetze\Gesetz($driver);
+
+            # Assert result
+            $this->assertInstanceOf('\S1SYPHOS\Gesetze\Gesetz', $result);
+
+            foreach ($result->drivers as $driver => $object) {
+                $this->assertInstanceOf($drivers[$driver], $object);
+            }
+        }
+    }
+
+
+    public function testInvalidDriver(): void
+    {
+        # Setup
+        # (1) Providers
+        $drivers = [
+            '',
+            '?!#@=',
+            'g3s3tz3',
+            'd3!ur3',
+        ];
+
+        # Assert exception
+        $this->expectException(\Exception::class);
+
+        foreach ($drivers as $driver) {
+            # Run function
+            $result = new \S1SYPHOS\Gesetze\Gesetz($driver);
+        }
+    }
+
+
     public function testAnalyze(): void
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -282,7 +319,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -320,7 +357,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) Norms
         $norms = [
@@ -340,7 +377,7 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Instance
-        $object = new \S1SYPHOS\GesetzeImInternet();
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
 
         # (2) HTML document
         $dom = new \DOMDocument;
