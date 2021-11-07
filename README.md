@@ -48,7 +48,7 @@ var_dump($obj->validate($obj::analyze('§ 433 II BGB')));
 # bool(true)
 
 foreach ($obj->extract('While § 433 II BGB exists, Art. 4c GG does not!') as $match) {
-    var_dump($obj->validate($match['meta']);
+    var_dump($obj->validate($match);
 }
 
 # bool(true)
@@ -80,11 +80,9 @@ var_dump($obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as wel
 
 # array(2) {
 #   [0]=>
-#   array(2) {
-#     ["full"]=>
-#     string(19) "§ 1 I Nr. 1 BGB"
-#     ["meta"]=>
-#     array(6) {
+#   array(7) {
+#       ["match"]=>
+#       string(19) "§ 1 I Nr. 1 BGB"
 #       ["norm"]=>
 #       string(4) "1"
 #       ["absatz"]=>
@@ -100,11 +98,9 @@ var_dump($obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as wel
 #     }
 #   }
 #   [1]=>
-#   array(2) {
-#     ["full"]=>
-#     string(14) "Art. 4 GG"
-#     ["meta"]=>
-#     array(6) {
+#   array(7) {
+#       ["match"]=>
+#       string(14) "Art. 4 GG"
 #       ["norm"]=>
 #       string(2) "4"
 #       ["absatz"]=>

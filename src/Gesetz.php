@@ -256,7 +256,7 @@ class Gesetz
             $data = [];
 
             foreach ($matches[0] as $index => $match) {
-                $array = [];
+                $array = ['match' => $match];
 
                 foreach (array_slice($matches, 1) as $i => $results) {
                     $array[self::$groups[$i]] = $results[$index];
@@ -267,14 +267,12 @@ class Gesetz
                     continue;
                 }
 
+                # Convert roman to arabic numerals (if enabled)
                 if ($roman2arabic) {
                     $array['absatz'] = self::roman2arabic($array['absatz']);
                 }
 
-                $data[] = [
-                    'full' => $match,
-                    'meta' => $array,
-                ];
+                $data[] = $array;
             }
 
             return $data;
@@ -305,7 +303,7 @@ class Gesetz
         foreach ($matches as $match) {
             foreach ($this->drivers as $object) {
                 # Block invalid laws & legal norms (if enabled)
-                if ($this->validate && !$object->validate($match['meta'])) {
+                if ($this->validate && !$object->validate($match)) {
                     continue;
                 }
 
@@ -314,10 +312,10 @@ class Gesetz
                 $attributes = $this->attributes;
 
                 # (2) Determine `href` attribute
-                $attributes['href'] = $object->buildURL($match['meta']);
+                $attributes['href'] = $object->buildURL($match);
 
                 # (3) Determine `title` attribute
-                $attributes['title'] = $object->buildTitle($match['meta'], $this->title);
+                $attributes['title'] = $object->buildTitle($match, $this->title);
 
                 # (4) Provide fallback for `target` attribute
                 if (!isset($attributes['target'])) {
@@ -339,10 +337,10 @@ class Gesetz
             }, array_keys($attributes), array_values($attributes));
 
             # (2) Combine everything
-            $link = '<a ' . implode(' ', $attributes) . '>' . $match['full'] . '</a>';
+            $link = '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
 
             # Replace matched legal norm with its `a` tag
-            $string = str_replace($match['full'], $link, $string);
+            $string = str_replace($match['match'], $link, $string);
         }
 
         return $string;
