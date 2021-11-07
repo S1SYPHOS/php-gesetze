@@ -48,6 +48,29 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
+    public function testValidDriver(): void
+    {
+        # Setup
+        # (1) Providers
+        $drivers = [
+            'gesetze' => '\S1SYPHOS\Gesetze\Drivers\GesetzeImInternet',
+            'dejure' => '\S1SYPHOS\Gesetze\Drivers\DejureOnline',
+        ];
+
+        foreach ($drivers as $driver => $className) {
+            # Run function
+            $result = new \S1SYPHOS\Gesetze\Gesetz($driver);
+
+            # Assert result
+            $this->assertInstanceOf('\S1SYPHOS\Gesetze\Gesetz', $result);
+
+            foreach ($result->drivers as $driver => $object) {
+                $this->assertInstanceOf($drivers[$driver], $object);
+            }
+        }
+    }
+
+
     public function testInvalidDriver(): void
     {
         # Setup
