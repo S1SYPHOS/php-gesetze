@@ -48,6 +48,27 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
+    public function testInvalidDriver(): void
+    {
+        # Setup
+        # (1) Providers
+        $drivers = [
+            '',
+            '?!#@=',
+            'g3s3tz3',
+            'd3!ur3',
+        ];
+
+        # Assert exception
+        $this->expectException(\Exception::class);
+
+        foreach ($drivers as $driver) {
+            # Run function
+            $result = new \S1SYPHOS\Gesetze\Gesetz($driver);
+        }
+    }
+
+
     public function testAnalyze(): void
     {
         # Setup
