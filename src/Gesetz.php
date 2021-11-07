@@ -29,6 +29,7 @@ class Gesetz
      */
     private $drivers = [
         'gesetze' => null,
+        'dejure'  => null,
     ];
 
 
@@ -129,15 +130,18 @@ class Gesetz
             $this->drivers = array_merge([$driver => null], $this->drivers);
         }
 
-        # Initialize drivers
+        # Iterate over available drivers ..
         array_walk($this->drivers, function(&$object, $driver) {
-            switch ($driver) {
-                case 'gesetze':
-                    $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet();
+            # .. initializing each one of them
+            # (1) 'gesetze-im-internet.de'
+            if ($driver === 'gesetze') {
+                $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet();
+
             }
 
-            if (!isset($object)) {
-                throw new \Exception(sprintf('Coult not initialize driver: "%s"', $driver));
+            # (2) 'dejure.org'
+            if ($driver === 'gesetze') {
+                $object = new \S1SYPHOS\Gesetze\Drivers\DejureOnline();
             }
         });
     }
