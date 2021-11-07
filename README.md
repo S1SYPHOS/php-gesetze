@@ -1,16 +1,19 @@
 # php-gesetze
 
-Linking texts with gesetze-im-internet.de, no fuss
-
-WIP
+Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
 
 ## Usage
 
-Getting information on a single legal norm can easily be achieved by the (static) `analyze` helper function:
+The following functions are available:
+
+
+### `analyze(string $string): array`
+
+Analyzes a single legal norm:
 
 ```php
-$result = \S1SYPHOS\GesetzeImInternet::analyze('Art. 1 II GG');
+$result = \S1SYPHOS\Gesetze\Gesetz::analyze('Art. 1 II GG');
 
 var_dump($result);
 
@@ -30,22 +33,50 @@ var_dump($result);
 # }
 ```
 
-**Note:** In contrast to `analyze`, all other function only match & link *existing* laws & legal norms!
+**Note:** In contrast to `analyze`, all other function only match & link *valid* laws & legal norms! For more information, see `validate()`.
 
-You may want to transform roman into arabic numerals, look no further: `roman2arabic` has got your back:
+
+### `validate(array $array): bool`
+
+Validates a single legal norm (across all providers):
 
 ```php
-echo \S1SYPHOS\GesetzeImInternet::roman2arabic('IX');
+$obj = new \S1SYPHOS\Gesetze\Gesetz;
+
+var_dump($obj->validate($obj::analyze('§ 433 II BGB')));
+
+# bool(true)
+
+foreach ($obj->extract('While § 433 II BGB exists, Art. 4c GG does not!') as $match) {
+    var_dump($obj->validate($match['meta']);
+}
+
+# bool(true)
+# bool(false)
+```
+
+**Note:** In the context of this library, being *valid* means *linkable by at least one provider*, as in *to be found in their database*.
+
+
+### `roman2arabic(string $string): string`
+
+Converts roman numerals to arabic numerals:
+
+```php
+echo \S1SYPHOS\Gesetze\Gesetz::roman2arabic('IX');
 
 # 9
 ```
 
-Want to `extract` legal norms from a text? Here you go:
+
+### `extract(string $string, bool $roman2arabic = false): array`
+
+Extracts legal norms from text:
 
 ```php
-$obj = new \S1SYPHOS\GesetzeImInternet;
+$obj = new \S1SYPHOS\Gesetze\Gesetz;
 
-echo $obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG');
+var_dump($obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG'));
 
 # array(2) {
 #   [0]=>
@@ -91,10 +122,13 @@ echo $obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as
 # }
 ```
 
-For those wanting to replace all legal norms with links to their corresponding `gesetze-im-internet.de` websites, `linkify` is the right choice:
+
+### `linkify(string $string): string`
+
+Transforms legal references into HTML link tags:
 
 ```php
-$obj = new \S1SYPHOS\GesetzeImInternet;
+$obj = new \S1SYPHOS\Gesetze\Gesetz;
 
 echo $obj->linkify('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4c GG');
 
@@ -114,18 +148,19 @@ $text .= 'It contains legal norms, like Art. 12 I GG.';
 $text .= '.. or § 433 II nr. 2 BGB!';
 $text .= '</div>';
 
-$obj = new \S1SYPHOS\GesetzeImInternet;
-$text = $obj->linkify($text);
+# Initialize object
+$obj = new \S1SYPHOS\Gesetze\Gesetz;
 
-echo $text;
+# Transform text
+echo $obj->linkify($text);
 
-# Result:
-#
 # <div>This is a <b>simple</b> HTML text.
 # It contains legal norms, like <a href="https://www.gesetze-im-internet.de/gg/art_12.html" target="_blank">Art. 12 I GG</a>.
 # .. or <a href="https://www.gesetze-im-internet.de/bgb/__433.html" target="_blank">§ 433 II nr. 2 BGB</a>!
 # </div>
 ```
+
+**Note:** Caching the result (to avoid repeated lookups & save resources) is beyond the scope of this library and therefore totally up to you!
 
 
 ## Credits
