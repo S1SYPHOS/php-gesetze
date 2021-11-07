@@ -217,6 +217,11 @@ class Gesetz
      */
     public function validate(array $array): bool
     {
+        # Fail early when regex match is empty
+        if (empty($array)) {
+            return false;
+        }
+
         # Set default
         $validity = false;
 
