@@ -146,14 +146,14 @@ class Gesetz
                 $object = new \S1SYPHOS\Gesetze\Drivers\DejureOnline();
             }
 
-            # (3) 'lexparency.de'
-            if ($driver === 'lexparency') {
-                $object = new \S1SYPHOS\Gesetze\Drivers\Lexparency();
-            }
-
-            # (4) 'buzer.de'
+            # (3) 'buzer.de'
             if ($driver === 'buzer') {
                 $object = new \S1SYPHOS\Gesetze\Drivers\Buzer();
+            }
+
+            # (4) 'lexparency.de'
+            if ($driver === 'lexparency') {
+                $object = new \S1SYPHOS\Gesetze\Drivers\Lexparency();
             }
         });
     }

@@ -21,8 +21,8 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $drivers = [
             'gesetze'    => '\S1SYPHOS\Gesetze\Drivers\GesetzeImInternet',
             'dejure'     => '\S1SYPHOS\Gesetze\Drivers\DejureOnline',
-            'lexparency' => '\S1SYPHOS\Gesetze\Drivers\Lexparency',
             'buzer'      => '\S1SYPHOS\Gesetze\Drivers\Buzer',
+            'lexparency' => '\S1SYPHOS\Gesetze\Drivers\Lexparency',
         ];
 
         foreach ($drivers as $driver => $className) {
