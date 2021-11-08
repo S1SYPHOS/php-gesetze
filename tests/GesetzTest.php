@@ -310,6 +310,15 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
                 'lit'    => '',
                 'gesetz' => 'BGB',
             ],
+            '§§ 133, 157 BGB' => [
+                'match'  => '§§ 133, 157 BGB',
+                'norm'   => '133',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
         ];
 
         # Run function
