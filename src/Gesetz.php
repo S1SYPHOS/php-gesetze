@@ -324,10 +324,16 @@ class Gesetz
             return $string;
         }
 
-        # Iterate over matches
+        # Iterate over matches ..
         foreach ($matches as $match) {
-            foreach ($this->drivers as $object) {
-                # Block invalid laws & legal norms (if enabled)
+            # .. and drivers for each match ..
+            foreach ($this->drivers as $driver => $object) {
+                # (1) .. skipping blocked drivers
+                if (in_array($driver, $this->blockList)) {
+                    continue;
+                }
+
+                # (2).. blocking invalid laws & legal norms (if enabled)
                 if ($this->validate && !$object->validate($match)) {
                     continue;
                 }
