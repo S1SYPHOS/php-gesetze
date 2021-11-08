@@ -356,7 +356,8 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
         $text .= '.. or § 433 II BGB!';
         $text .= 'At the same time, there are invalid ones, like ..';
-        $text .= '§ 1a BGB and § 1 GGGG';
+        $text .= '§ 1a BGB and § 1 GGGG ..';
+        $text .= '.. and what european law, like Art. 2 Abs. 2 DSGVO?';
         $text .= '</div>';
 
         # (3) HTML document
@@ -374,7 +375,21 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $result = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(2, count($result));
+        $this->assertEquals(3, count($result));
+
+        # Change condition `blockList`
+        $object->blockList = [
+            'gesetze',
+            'dejure',
+            'buzer',
+            'lexparency',
+        ];
+
+        @$dom->loadHTML($object->linkify($text));
+        $result = $dom->getElementsByTagName('a');
+
+        # Assert result
+        $this->assertEquals(0, count($result));
 
         # Change condition `validate`
         $object->validate = false;
@@ -384,6 +399,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $result = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(4, count($result));
+        $this->assertEquals(5, count($result));
     }
 }

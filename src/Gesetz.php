@@ -36,6 +36,14 @@ class Gesetz
 
 
     /**
+     * Blocked providers
+     *
+     * @var array
+     */
+    public $blockList = [];
+
+
+    /**
      * The regex, holding the world together in its inmost folds
      *
      * For reference:
@@ -70,7 +78,7 @@ class Gesetz
      *
      * @var array
      */
-    public static $groups = [
+    private static $groups = [
         'norm',
         'absatz',
         'satz',
@@ -238,8 +246,13 @@ class Gesetz
         $validity = false;
 
         # Iterate over drivers ..
-        foreach ($this->drivers as $object) {
-            # .. validating legal norm
+        foreach ($this->drivers as $driver => $object) {
+            # (1) .. skipping blocked drivers
+            if (in_array($driver, $this->blockList)) {
+                continue;
+            }
+
+            # (2) .. validating legal norm
             if ($object->validate($array)) {
                 # Upon first hit ..
                 # (1) .. affirm its validity
