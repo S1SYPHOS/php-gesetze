@@ -30,6 +30,7 @@ class Gesetz
     public $drivers = [
         'gesetze'    => null,
         'dejure'     => null,
+        'buzer'      => null,
         'lexparency' => null,
     ];
 
@@ -148,6 +149,11 @@ class Gesetz
             # (3) 'lexparency.de'
             if ($driver === 'lexparency') {
                 $object = new \S1SYPHOS\Gesetze\Drivers\Lexparency();
+            }
+
+            # (4) 'buzer.de'
+            if ($driver === 'buzer') {
+                $object = new \S1SYPHOS\Gesetze\Drivers\Buzer();
             }
         });
     }
