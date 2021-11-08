@@ -3,8 +3,8 @@
     "description": "Linking german legal norms, dependency-free & GDPR-friendly",
     "type": "library",
     "license": "GPL-3.0",
-    "version": "0.4.0",
-    "keywords": ["api", "legal", "gesetze-im-internet", "bjm"],
+    "version": "0.4.1",
+    "keywords": ["bjm", "api", "law", "laws", "legal", "legal tech", "gesetze", "gesetze-im-internet.de", "dejure", "dejure.org", "buzer", "buzer.de", "lexparency", "lexparency.de"],
     "homepage": "https://github.com/S1SYPHOS",
     "scripts": {
         "cs-dry": "php-cs-fixer fix --dry-run --diff",
