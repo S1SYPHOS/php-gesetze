@@ -400,6 +400,9 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals(0, count($result));
 
+        # Revert condition `blockList`
+        $object->blockList = [];
+
         # Change condition `validate`
         $object->validate = false;
 
