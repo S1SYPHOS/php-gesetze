@@ -186,13 +186,6 @@ def lexparency() -> None:
     # Define identifier
     identifier = 'lexparency'
 
-    # Create data directory
-    # (1) Define its path
-    base = '{}/{}'.format(path, identifier)
-
-    # (2) Create (if necessary)
-    create_path(base)
-
     # Fetch overview page
     html = get_url('https://lexparency.de').text
 
@@ -315,6 +308,85 @@ def create_path(path):
             pass
 
 
+def buzer() -> None:
+    # Define identifier
+    identifier = 'buzer'
+
+    # Fetch overview page
+    html = get_url('https://www.buzer.de').text
+
+    # Create data array
+    data = {}
+
+    # Parse their HTML & iterate over `a` tags ..
+    for link in bs(html, 'html.parser').select('.table1')[0].select('a'):
+        # .. extracting data for each law
+        law = link.text.strip()
+
+        slug = link['href']
+
+        # .. reporting current law
+        print('Storing {} ..'.format(law))
+
+        # .. collecting its information
+        node = {
+            'law': law,
+            'slug': slug,
+            'title': '',
+            'headings': {},
+        }
+
+        # Fetch index page for each law
+        law_html = get_url(slug).text
+
+        # Get title
+        title = bs(law_html, 'html.parser').select('h1')[0].text
+
+        # Strip shorthand from title (if present)
+        match = re.match(r'(.*)\s\(.*\)$', title)
+
+        # If heading was found ..
+        if match:
+            # .. store it as title for current law
+            title = match.group(1)
+
+        node['title'] = title
+
+        # Iterate over `li` tags ..
+        for heading in bs(law_html, 'html.parser').find_all('a', attrs={'class': 'preview'}):
+            # .. skipping headings without `title` attribute
+            if not heading.get('title'):
+                continue
+
+            heading = {
+                'slug': heading['href'][1:],
+                'text': heading.text.replace('§  ', '§ '),
+            }
+
+            # Determine section identifier
+            match = re.match(r'(?:§+|Art|Artikel)\.?\s*(\d+(?:\w\b)?)', heading['text'], re.IGNORECASE)
+
+            # If section identifier was found ..
+            if match:
+                # .. store identifier as key and heading as value
+                node['headings'][match.group(1)] = heading
+
+            # .. otherwise ..
+            else:
+                # .. store heading as both key and value
+                node['headings'][heading['text']] = heading
+
+        # Store data record
+        data[law.lower()] = node
+
+        # Wait for it ..
+        time.sleep(2)
+
+    # Write complete dataset to JSON file
+    with open('{}/{}.json'.format(path, identifier), 'w') as file:
+        json.dump(data, file, ensure_ascii=False)
+
+
 if __name__ == '__main__':
     print('Current database: "gesetze-im-internet.de" ..')
     gesetze()
@@ -324,3 +396,6 @@ if __name__ == '__main__':
 
     print('Current database: "lexparency.de" ..')
     lexparency()
+
+    print('Current database: "buzer.de" ..')
+    buzer()
