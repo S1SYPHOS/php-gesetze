@@ -3,9 +3,22 @@
 Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
 
+## Getting started
+
+Upon invoking the main class, you may specify your preferred provider (or 'driver'), like this:
+
+```php
+$object = new \S1SYPHOS\Gesetze\Gesetz('dejure');
+```
+
+**Note:** This option defaults to `gesetze`, which is a good overall choice, simply because of the vast array of supported laws. However, other possible values are `'dejure'`, `'buzer'` & `'lexparency'`.
+
+Out of the box, `php-gesetze` cycles through all known drivers until a match is found. If you want to exclude certain drivers, have a look at the `$object->blockList` option.
+
+
 ## Usage
 
-The following functions are available:
+From there, the following functions are available:
 
 
 ### `analyze(string $string): array`
@@ -157,6 +170,65 @@ echo $obj->linkify($text);
 ```
 
 **Note:** Caching the result (to avoid repeated lookups & save resources) is beyond the scope of this library and therefore totally up to you!
+
+
+## Configuration
+
+There are several settings you may use in order to change the behavior of the library:
+
+
+### `$object->drivers (array)`
+
+Associative array, holding all available drivers (already initialized), where the corresponding keys are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'`.
+
+
+### `$object->blockList (array)`
+
+Non-associative array, holding driver that should not be used when matching legal norms. Possible values are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'`.
+
+
+### `$object::$pattern (string)`
+
+The regex responsible for detecting legal norms. For reference, it amounts to this:
+
+```php
+'/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
+```
+
+
+### `$object->attributes (array)`
+
+Other HTML attributes to be applied globally:
+
+```php
+$object->attributes = [
+    'attr1' => 'some-value',
+    'attr2' => 'other-value',
+];
+
+# .. would generate links like this:
+
+<a href="https://example.com/some-law" attr1="some-value" attr2="other-value">§ 1 SomeLaw</a>
+```
+
+
+### `$object->title (false|string)`
+
+Controls `title` attribute:
+
+| Option     | Description                        |
+| ---------- | ---------------------------------- |
+| `false`    | No `title` attribute (default)     |
+| `'light'`  | abbreviated law (eg 'GG')          |
+| `'normal'` | complete law (eg 'Grundgesetz')    |
+| `'full'`   | official heading (eg 'Artikel 12') |
+
+
+### `$object->validate (bool)`
+
+Defines whether laws & legal norms should be validated upon extracting / linking - default to `true`. When `false`, legal norms like `'Art. 1 GGGG'` (invalid law) or `'Art. 12a GG'` (invalid norm) would be seen as valid and therefore be extracted / linked.
+
+**Note:** In this case, it is strongly recommended to avoid setting `$object->title` to `'full'` - you have been warned!
 
 
 ## Credits
