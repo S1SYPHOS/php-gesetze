@@ -4,7 +4,7 @@
     "type": "library",
     "license": "GPL-3.0",
     "version": "0.4.2",
-    "keywords": ["bjm", "api", "law", "laws", "legal", "legal tech", "gesetze", "gesetze-im-internet.de", "dejure", "dejure.org", "buzer", "buzer.de", "lexparency", "lexparency.de"],
+    "keywords": ["bjm", "law", "laws", "legal", "legal tech", "gesetze", "gesetze-im-internet.de", "dejure", "dejure.org", "buzer", "buzer.de", "lexparency", "lexparency.de"],
     "homepage": "https://github.com/S1SYPHOS",
     "scripts": {
         "cs-dry": "php-cs-fixer fix --dry-run --diff",
