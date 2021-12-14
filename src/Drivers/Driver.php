@@ -88,17 +88,6 @@ abstract class Driver
 
 
     /**
-     * Builds URL for corresponding legal norm
-     *
-     * Used as `href` attribute
-     *
-     * @param array $array Formatted regex match
-     * @return string
-     */
-    abstract protected function buildURL(array $array): string;
-
-
-    /**
      * Builds description for corresponding legal norm
      *
      * Used as `title` attribute
@@ -107,5 +96,37 @@ abstract class Driver
      * @param mixed $mode Mode of operation
      * @return string
      */
-    abstract protected function buildTitle(array $array, $mode): string;
+    public function buildTitle(array $array, $mode): string
+    {
+        # Get lowercase identifier for current law
+        $identifier = strtolower($array['gesetz']);
+
+        # Get data about current law
+        $law = $this->library[$identifier];
+
+        # Determine `title` attribute
+        switch ($mode) {
+            case 'light':
+                return $law['law'];
+
+            case 'normal':
+                return $law['title'];
+
+            case 'full':
+                return $law['headings'][$array['norm']];
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Builds URL for corresponding legal norm
+     *
+     * Used as `href` attribute
+     *
+     * @param array $array Formatted regex match
+     * @return string
+     */
+    abstract protected function buildURL(array $array): string;
 }
