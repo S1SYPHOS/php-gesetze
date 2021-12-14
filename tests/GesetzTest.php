@@ -286,10 +286,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testExtract(): void
     {
         # Setup
-        # (1) Instance
-        $object = new \S1SYPHOS\Gesetze\Gesetz();
-
-        # (2) Norms
+        # (1) Norms
         $norms = [
             # Note: Despite using a section sign instead of 'Art(ikel)', this works!
             '§ 1 GG'   => [
@@ -324,27 +321,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $match => $data) {
             # Assert result
-            $this->assertEquals([$data], $object->extract($match));
-        }
-    }
-
-
-    public function testInvalidExtract(): void
-    {
-        # Setup
-        # (1) Instance
-        $object = new \S1SYPHOS\Gesetze\Gesetz();
-
-        # (2) Norms
-        $norms = [
-            '§ 1a BGB' => [],
-            '§ 1 GGGG' => [],
-        ];
-
-        # Run function
-        foreach ($norms as $norm => $expected) {
-            # Assert result
-            $this->assertEquals($expected, $object->extract($norm));
+            $this->assertEquals([$data], \S1SYPHOS\Gesetze\Gesetz::extract($match));
         }
     }
 
@@ -400,17 +377,17 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals(0, count($result));
 
-        # Revert condition `blockList`
-        $object->blockList = [];
-
-        # Change condition `validate`
-        $object->validate = false;
+        # Disable 'DSGVO' detection
+        $object->blockList = [
+            'dejure',
+            'lexparency',
+        ];
 
         # Run function
         @$dom->loadHTML($object->linkify($text));
         $result = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(5, count($result));
+        $this->assertEquals(2, count($result));
     }
 }
