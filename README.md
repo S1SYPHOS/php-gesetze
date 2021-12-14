@@ -48,15 +48,13 @@ var_dump($result);
 # }
 ```
 
-**Note:** In contrast to `analyze`, all other function only match & link *valid* laws & legal norms! For more information, see `validate()`.
-
 
 ### `validate(array $array): bool`
 
 Validates a single legal norm (across all providers):
 
 ```php
-$obj = new \S1SYPHOS\Gesetze\Gesetz;
+$obj = new \S1SYPHOS\Gesetze\Gesetz();
 
 var_dump($obj->validate($obj::analyze('§ 433 II BGB')));
 
@@ -89,9 +87,7 @@ echo \S1SYPHOS\Gesetze\Gesetz::roman2arabic('IX');
 Extracts legal norms from text:
 
 ```php
-$obj = new \S1SYPHOS\Gesetze\Gesetz;
-
-var_dump($obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG'));
+var_dump(\S1SYPHOS\Gesetze\Gesetz::extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG'));
 
 # array(2) {
 #   [0]=>
@@ -139,7 +135,7 @@ var_dump($obj->extract('This is a simple text, featuring § 1 I Nr. 1 BGB as wel
 Transforms legal references into HTML link tags:
 
 ```php
-$obj = new \S1SYPHOS\Gesetze\Gesetz;
+$obj = new \S1SYPHOS\Gesetze\Gesetz();
 
 echo $obj->linkify('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4c GG');
 
@@ -160,7 +156,7 @@ $text .= '.. or § 433 II nr. 2 BGB!';
 $text .= '</div>';
 
 # Initialize object
-$obj = new \S1SYPHOS\Gesetze\Gesetz;
+$obj = new \S1SYPHOS\Gesetze\Gesetz();
 
 # Transform text
 echo $obj->linkify($text);

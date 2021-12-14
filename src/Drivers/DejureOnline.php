@@ -11,13 +11,6 @@ namespace S1SYPHOS\Gesetze\Drivers;
 class DejureOnline extends Driver
 {
     /**
-     * Traits
-     */
-
-    use \S1SYPHOS\Gesetze\Traits\Title;
-
-
-    /**
      * Properties
      */
 
@@ -45,16 +38,9 @@ class DejureOnline extends Driver
         # Get lowercase identifier for current law
         $identifier = strtolower($array['gesetz']);
 
-        # Get data about current law
-        $law = $this->library[$identifier];
-
-        # Set base URL
-        $url = 'https://dejure.org/gesetze';
-
-        # Set HTML file
-        $file = $array['norm'] . '.html';
-
         # Combine everything
-        return sprintf('%s/%s/%s', $url, $law['slug'], $file);
+        return sprintf('https://dejure.org/gesetze/%s/%s',
+            $this->library[$identifier]['slug'], $array['norm'] . '.html'
+        );
     }
 }

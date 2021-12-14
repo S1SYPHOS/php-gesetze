@@ -111,14 +111,6 @@ class Gesetz
 
 
     /**
-     * Defines whether laws & legal norms should be validated upon extracting / linking
-     *
-     * @var bool
-     */
-    public $validate = true;
-
-
-    /**
      * Constructor
      *
      * @param string $driver Provider identifier
@@ -273,7 +265,7 @@ class Gesetz
      * @param string $string Text
      * @return array Formatted regex matches
      */
-    public function extract(string $string, bool $roman2arabic = false): array
+    public static function extract(string $string): array
     {
         # Look for legal norms in text
         if (preg_match_all(self::$pattern, $string, $matches)) {
@@ -285,16 +277,6 @@ class Gesetz
 
                 foreach (array_slice($matches, 1) as $i => $results) {
                     $array[self::$groups[$i]] = $results[$index];
-                }
-
-                # Block invalid laws & legal norms (if enabled)
-                if ($this->validate && !$this->validate($array)) {
-                    continue;
-                }
-
-                # Convert roman to arabic numerals (if enabled)
-                if ($roman2arabic) {
-                    $array['absatz'] = self::roman2arabic($array['absatz']);
                 }
 
                 $data[] = $array;
@@ -316,7 +298,7 @@ class Gesetz
     public function linkify(string $string): string
     {
         # Extract matching legal norms
-        $matches = $this->extract($string);
+        $matches = self::extract($string);
 
         # If none were found ..
         if (empty($matches)) {
@@ -333,8 +315,8 @@ class Gesetz
                     continue;
                 }
 
-                # (2).. blocking invalid laws & legal norms (if enabled)
-                if ($this->validate && !$object->validate($match)) {
+                # (2).. blocking invalid laws & legal norms
+                if (!$object->validate($match)) {
                     continue;
                 }
 
