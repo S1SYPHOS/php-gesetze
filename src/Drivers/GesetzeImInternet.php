@@ -11,13 +11,6 @@ namespace S1SYPHOS\Gesetze\Drivers;
 class GesetzeImInternet extends Driver
 {
     /**
-     * Traits
-     */
-
-    use \S1SYPHOS\Gesetze\Traits\Title;
-
-
-    /**
      * Properties
      */
 
@@ -45,12 +38,6 @@ class GesetzeImInternet extends Driver
         # Get lowercase identifier for current law
         $identifier = strtolower($array['gesetz']);
 
-        # Get data about current law
-        $law = $this->library[$identifier];
-
-        # Set base URL
-        $url = 'https://www.gesetze-im-internet.de';
-
         # Set default HTML file
         $file = '__' . $array['norm'] . '.html';
 
@@ -61,6 +48,8 @@ class GesetzeImInternet extends Driver
         }
 
         # Combine everything
-        return sprintf('%s/%s/%s', $url, $law['slug'], $file);
+        return sprintf('https://www.gesetze-im-internet.de/%s/%s',
+            $this->library[$identifier]['slug'], $file
+        );
     }
 }

@@ -38,14 +38,10 @@ class Buzer extends Driver
         # Get lowercase identifier for current law
         $identifier = strtolower($array['gesetz']);
 
-        # Get data about current law
-        $law = $this->library[$identifier];
-
-        # Get data about current norm
-        $slug = $law['headings'][$array['norm']]['slug'];
-
         # Combine everything
-        return sprintf('https://buzer.de/%s', $slug);
+        return sprintf('https://buzer.de/%s',
+            $this->library[$identifier]['headings'][$array['norm']]['slug']
+        );
     }
 
 
