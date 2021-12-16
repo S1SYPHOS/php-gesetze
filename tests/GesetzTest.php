@@ -11,6 +11,41 @@ namespace S1SYPHOS\Gesetze\Tests;
 class GesetzTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Properties
+     */
+
+    /**
+     * @var string
+     */
+    private static $text;
+
+
+    /**
+     * Setup
+     */
+
+    public static function setUpBeforeClass(): void
+    {
+        # Setup
+        # (1) Text
+        # (a) Enforce UTF-8 encoding
+        $text = '<!DOCTYPE html><meta charset="UTF-8">';
+
+        # (b) Insert test string
+        $text .= '<div>';
+        $text .= 'This is a <strong>simple</strong> HTML text.';
+        $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
+        $text .= '.. or § 433 II BGB!';
+        $text .= 'At the same time, there are invalid ones, like ..';
+        $text .= '§ 1a BGB and § 1 GGGG ..';
+        $text .= '.. and what european law, like Art. 2 Abs. 2 DSGVO?';
+        $text .= '</div>';
+
+        self::$text = $text;
+    }
+
+
+    /**
      * Tests
      */
 
@@ -407,36 +442,22 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # (1) Instance
         $object = new \S1SYPHOS\Gesetze\Gesetz();
 
-        # (2) Text
-        # Enforce UTF-8 encoding
-        $text = '<!DOCTYPE html><meta charset="UTF-8">';
-
-        # Insert test string
-        $text .= '<div>';
-        $text .= 'This is a <strong>simple</strong> HTML text.';
-        $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
-        $text .= '.. or § 433 II BGB!';
-        $text .= 'At the same time, there are invalid ones, like ..';
-        $text .= '§ 1a BGB and § 1 GGGG ..';
-        $text .= '.. and what european law, like Art. 2 Abs. 2 DSGVO?';
-        $text .= '</div>';
-
-        # (3) HTML document
+        # (2) HTML document
         $dom = new \DOMDocument;
 
         # Run function
-        @$dom->loadHTML($text);
-        $result = $dom->getElementsByTagName('a');
+        @$dom->loadHTML(self::$text);
+        $result1 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(0, count($result));
+        $this->assertEquals(0, count($result1));
 
         # Run function
-        @$dom->loadHTML($object->linkify($text));
-        $result = $dom->getElementsByTagName('a');
+        @$dom->loadHTML($object->linkify(self::$text));
+        $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(3, count($result));
+        $this->assertEquals(3, count($result2));
 
         # Change condition `blockList`
         $object->blockList = [
@@ -446,11 +467,11 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             'lexparency',
         ];
 
-        @$dom->loadHTML($object->linkify($text));
-        $result = $dom->getElementsByTagName('a');
+        @$dom->loadHTML($object->linkify(self::$text));
+        $result3 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(0, count($result));
+        $this->assertEquals(0, count($result3));
 
         # Disable 'DSGVO' detection
         $object->blockList = [
@@ -459,11 +480,87 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function
-        @$dom->loadHTML($object->linkify($text));
-        $result = $dom->getElementsByTagName('a');
+        @$dom->loadHTML($object->linkify(self::$text));
+        $result4 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(2, count($result));
+        $this->assertEquals(2, count($result4));
+    }
+
+
+    public function testLinkifyTitle()
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) HTML document
+        $dom = new \DOMDocument;
+
+        # (3) `Title` attributes
+        $titles = [
+            'Art. 12 Abs. 1 GG' => [
+                'light' => 'GG',
+                'normal' => 'Grundgesetz für die Bundesrepublik Deutschland',
+                'full' => 'Art 12',
+            ],
+            '§ 433 II BGB' => [
+                'light' => 'BGB',
+                'normal' => 'Bürgerliches Gesetzbuch',
+                'full' => '§ 433 Vertragstypische Pflichten beim Kaufvertrag',
+            ],
+            'Art. 2 Abs. 2 DSGVO' => [
+                'light' => 'DSGVO',
+                'normal' => 'Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 zum Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten, zum freien Datenverkehr und zur Aufhebung der Richtlinie 95/46/EG',
+                'full' => 'Art.  2 Sachlicher Anwendungsbereich',
+            ],
+        ];
+
+
+        # Run function #1
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links1 = $dom->getElementsByTagName('a');
+
+        foreach ($links1 as $link) {
+            # Assert result
+            $this->assertEquals($link->getAttribute('title'), '');
+        }
+
+        # Change condition `title`
+        $object->title = 'light';
+
+        # Run function #2
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links2 = $dom->getElementsByTagName('a');
+
+        foreach ($links2 as $link) {
+            # Assert result
+            $this->assertEquals($link->getAttribute('title'), $titles[$link->nodeValue]['light']);
+        }
+
+        # Change condition `title`
+        $object->title = 'normal';
+
+        # Run function #3
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links3 = $dom->getElementsByTagName('a');
+
+        foreach ($links3 as $link) {
+            # Assert result
+            $this->assertEquals($link->getAttribute('title'), $titles[$link->nodeValue]['normal']);
+        }
+
+        # Change condition `title`
+        $object->title = 'full';
+
+        # Run function #4
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links4 = $dom->getElementsByTagName('a');
+
+        foreach ($links4 as $link) {
+            # Assert result
+            $this->assertEquals($link->getAttribute('title'), $titles[$link->nodeValue]['full']);
+        }
     }
 
 
