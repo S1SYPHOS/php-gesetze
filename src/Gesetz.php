@@ -159,14 +159,21 @@ class Gesetz
      * Converts roman numerals to arabic numerals
      *
      * @param string $string
-     * @return string
+     * @return int
+     * @throws \Exception
      */
-    public static function roman2arabic(string $string): string
+    public static function roman2arabic(string $string)
     {
-        if (!preg_match('/[IVX]+/', $string)) {
-            return $string;
+        # If one of the characters represents an invalid roman numeral ..
+        if (!preg_match('/[IVXLCDM]+/i', $string)) {
+            # .. throw error
+            throw new \Exception('Input contains invalid character.');
         }
 
+        # Transform string to uppercase
+        $string = strtoupper($string);
+
+        # Map roman numerals to their arabic equivalent
         # See https://stackoverflow.com/a/6266158
         $romans = [
             'M'  => 1000,
@@ -193,7 +200,7 @@ class Gesetz
             }
         }
 
-        return (string) $result;
+        return $result;
     }
 
 
