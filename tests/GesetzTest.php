@@ -465,4 +465,53 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals(2, count($result));
     }
+
+
+    public function testRoman2ArabicInvalid()
+    {
+        # Setup
+        # (1) Roman numerals
+        $invalidRomans = [
+            '',
+            'Y',
+            'AZ',
+            'OMG',
+            'LOL',
+            'ROFL',
+        ];
+
+        # Assert exception
+        $this->expectException(\Exception::class);
+
+        # Run function
+        foreach ($invalidRomans as $roman) {
+            # Run function
+            \S1SYPHOS\Gesetze\Gesetz::roman2arabic($roman);
+        }
+    }
+
+
+    public function testRoman2Arabic()
+    {
+        # Setup
+        # (1) Roman numerals
+        $romans = [
+            'II' => 2,
+            'IV' => 4,
+            'VI' => 6,
+            'IX' => 9,
+            'XIV' => 14,
+            'XIX' => 19,
+        ];
+
+        # Run function
+        foreach ($romans as $roman => $expected) {
+            # Assert ..
+            # (1) result for uppercase
+            $this->assertEquals(\S1SYPHOS\Gesetze\Gesetz::roman2arabic($roman), $expected);
+
+            # (2) result for lowercase
+            $this->assertEquals(\S1SYPHOS\Gesetze\Gesetz::roman2arabic(strtolower($roman)), $expected);
+        }
+    }
 }
