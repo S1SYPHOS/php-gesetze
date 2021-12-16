@@ -39,7 +39,7 @@ abstract class Driver
     public function __construct()
     {
         # Determine data file
-        $file = sprintf('%s/../../laws/%s.json', __DIR__, $this->identifier);
+        $file = sprintf('%s/../../data/%s.json', __DIR__, $this->identifier);
 
         if (!file_exists($file)) {
             throw new \Exception(sprintf('File does not exist: "%s"', realpath($file)));
