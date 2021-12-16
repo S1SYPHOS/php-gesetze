@@ -39,23 +39,98 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testInvalidDriver(): void
+    public function testDriverOrder(): void
     {
         # Setup
         # (1) Providers
         $drivers = [
-            '',
-            '?!#@=',
-            'g3s3tz3',
-            'd3!ur3',
+            # .. as string
+            [
+                'actual' => 'gesetze',
+                'expected' => ['gesetze', 'dejure', 'buzer', 'lexparency'],
+            ],
+            [
+                'actual' => 'buzer',
+                'expected' => ['buzer', 'gesetze', 'dejure', 'lexparency'],
+            ],
+            [
+                'actual' => 'dejure',
+                'expected' => ['dejure', 'gesetze', 'buzer', 'lexparency'],
+            ],
+            [
+                'actual' => 'lexparency',
+                'expected' => ['lexparency', 'gesetze', 'dejure', 'buzer'],
+            ],
+
+            # .. invalid entry
+            [
+                'actual' => '',
+                'expected' => ['gesetze', 'dejure', 'buzer', 'lexparency'],
+            ],
+            [
+                'actual' => '?!#@=',
+                'expected' => ['gesetze', 'dejure', 'buzer', 'lexparency'],
+            ],
+
+            # .. as list
+            [
+                'actual' => ['buzer'],
+                'expected' => ['buzer', 'gesetze', 'dejure', 'lexparency'],
+            ],
+            [
+                'actual' => ['lexparency'],
+                'expected' => ['lexparency', 'gesetze', 'dejure', 'buzer'],
+            ],
+            [
+                'actual' => ['buzer', 'dejure'],
+                'expected' => ['buzer', 'dejure', 'gesetze', 'lexparency'],
+            ],
+            [
+                'actual' => ['lexparency', 'buzer'],
+                'expected' => ['lexparency', 'buzer', 'gesetze', 'dejure'],
+            ],
+            [
+                'actual' => ['gesetze', 'lexparency', 'buzer'],
+                'expected' => ['gesetze', 'lexparency', 'buzer', 'dejure'],
+            ],
+            [
+                'actual' => ['buzer', 'dejure', 'lexparency'],
+                'expected' => ['buzer', 'dejure', 'lexparency', 'gesetze'],
+            ],
+            [
+                'actual' => ['lexparency', 'dejure', 'buzer', 'gesetze'],
+                'expected' => ['lexparency', 'dejure', 'buzer', 'gesetze'],
+            ],
+            [
+                'actual' => ['dejure', 'buzer', 'lexparency', 'gesetze'],
+                'expected' => ['dejure', 'buzer', 'lexparency', 'gesetze'],
+            ],
+
+            # .. more than four entries
+            [
+                'actual' => ['buzer', 'buzer', 'gesetze', 'dejure', 'buzer', 'gesetze'],
+                'expected' => ['buzer', 'gesetze', 'dejure', 'lexparency'],
+            ],
+
+            # .. invalid entries
+            [
+                'actual' => ['', '?!#@=', 'g3s3tz3', 'd3!ur3'],
+                'expected' => ['gesetze', 'dejure', 'buzer', 'lexparency'],
+            ],
         ];
 
-        # Assert exception
-        $this->expectException(\Exception::class);
+        # Run function #1
+        $result1 = new \S1SYPHOS\Gesetze\Gesetz($drivers);
 
-        foreach ($drivers as $driver) {
-            # Run function
-            $result = new \S1SYPHOS\Gesetze\Gesetz($driver);
+        # Assert result
+        $this->assertEquals(array_keys($result1->drivers), ['gesetze', 'dejure', 'buzer', 'lexparency']);
+
+        foreach ($drivers as $item) {
+            # Run function #2
+            $result2 = new \S1SYPHOS\Gesetze\Gesetz($item['actual']);
+
+            # Assert result
+            $this->assertEquals(array_keys($result2->drivers), $item['expected']);
         }
     }
 

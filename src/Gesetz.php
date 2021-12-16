@@ -27,12 +27,7 @@ class Gesetz
      *
      * @var array
      */
-    public $drivers = [
-        'gesetze'    => null,
-        'dejure'     => null,
-        'buzer'      => null,
-        'lexparency' => null,
-    ];
+    public $drivers = [];
 
 
     /**
@@ -113,49 +108,46 @@ class Gesetz
     /**
      * Constructor
      *
-     * @param string $driver Provider identifier
+     * @param mixed $driver Provider identifier
      * @return void
-     * @throws \Exception
      */
-    public function __construct(string $driver = 'gesetze')
+    public function __construct($order = 'gesetze')
     {
-        if (!array_key_exists($driver, $this->drivers)) {
-            throw new \Exception(sprintf('Invalid driver: "%s"', $driver));
-        }
+        # List available drivers
+        $drivers = [
+            # (1) 'gesetze-im-internet.de'
+            'gesetze' => '\S1SYPHOS\Gesetze\Drivers\GesetzeImInternet',
+            # (2) 'dejure.org'
+            'dejure' => '\S1SYPHOS\Gesetze\Drivers\DejureOnline',
+            # (3) 'buzer.de'
+            'buzer' => '\S1SYPHOS\Gesetze\Drivers\Buzer',
+            # (4) 'lexparency.de'
+            'lexparency' => '\S1SYPHOS\Gesetze\Drivers\Lexparency',
+        ];
 
-        # Move preferred driver to the beginning (if necessary)
-        if ($driver !== array_keys($this->drivers)[0]) {
-            # (1) Remove preference
-            unset($this->drivers[$driver]);
-
-            # (2) Readd at beginning
-            $this->drivers = array_merge([$driver => null], $this->drivers);
+        # If string was passed as order ..
+        if (is_string($order)) {
+            # .. make it an array
+            $order = [$order];
         }
 
         # Iterate over available drivers ..
-        array_walk($this->drivers, function(&$object, $driver) {
-            # .. initializing each one of them
-            # (1) 'gesetze-im-internet.de'
-            if ($driver === 'gesetze') {
-                $object = new \S1SYPHOS\Gesetze\Drivers\GesetzeImInternet();
-
+        foreach (array_keys($drivers) as $driver) {
+            # .. but skip default one(s)
+            if (in_array($driver, $order)) {
+                continue;
             }
 
-            # (2) 'dejure.org'
-            if ($driver === 'dejure') {
-                $object = new \S1SYPHOS\Gesetze\Drivers\DejureOnline();
-            }
+            # Add to order
+            $order[] = $driver;
+        }
 
-            # (3) 'buzer.de'
-            if ($driver === 'buzer') {
-                $object = new \S1SYPHOS\Gesetze\Drivers\Buzer();
+        # Initialize drivers
+        foreach ($order as $driver) {
+            if (in_array($driver, array_keys($drivers))) {
+                $this->drivers[$driver] = new $drivers[$driver]();
             }
-
-            # (4) 'lexparency.de'
-            if ($driver === 'lexparency') {
-                $object = new \S1SYPHOS\Gesetze\Drivers\Lexparency();
-            }
-        });
+        }
     }
 
 
