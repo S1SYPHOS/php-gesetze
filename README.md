@@ -1,4 +1,5 @@
 # php-gesetze
+[![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-gesetze/status.svg)](https://codeberg.org/S1SYPHOS/php-gesetze/issues)
 
 Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
