@@ -173,10 +173,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testAnalyze(): void
     {
         # Setup
-        # (1) Instance
-        $object = new \S1SYPHOS\Gesetze\Gesetz();
-
-        # (2) Norms
+        # (1) Norms
         $norms = [
             # Section
             '§ 1 BGB' => [
@@ -269,7 +266,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
                 'lit'    => '',
                 'gesetz' => 'BGB',
             ],
-
             '§ 1 Absatz 2a BGB' => [
                 'norm'   => '1',
                 'absatz' => '2a',
@@ -388,7 +384,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $full => $meta) {
             # Assert result
-            $this->assertEquals($meta, $object::analyze($full));
+            $this->assertEquals($meta, \S1SYPHOS\Gesetze\Gesetz::analyze($full));
         }
     }
 
