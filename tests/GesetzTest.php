@@ -398,19 +398,29 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # (2) HTML document
         $dom = new \DOMDocument;
 
-        # Run function
+        # Run function #1
         @$dom->loadHTML(self::$text);
         $result1 = $dom->getElementsByTagName('a');
 
         # Assert result
         $this->assertEquals(0, count($result1));
 
-        # Run function
+        # Run function #2
         @$dom->loadHTML($object->linkify(self::$text));
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
         $this->assertEquals(3, count($result2));
+    }
+
+
+    public function testLinkifyBlockList(): void
+    {    # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) HTML document
+        $dom = new \DOMDocument;
 
         # Change condition `blockList`
         $object->blockList = [
@@ -420,11 +430,12 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             'lexparency',
         ];
 
+        # Run function #1
         @$dom->loadHTML($object->linkify(self::$text));
-        $result3 = $dom->getElementsByTagName('a');
+        $result1 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(0, count($result3));
+        $this->assertEquals(0, count($result1));
 
         # Disable 'DSGVO' detection
         $object->blockList = [
@@ -432,12 +443,12 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             'lexparency',
         ];
 
-        # Run function
+        # Run function #2
         @$dom->loadHTML($object->linkify(self::$text));
-        $result4 = $dom->getElementsByTagName('a');
+        $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(2, count($result4));
+        $this->assertEquals(2, count($result2));
     }
 
 
@@ -541,6 +552,8 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             foreach ($attributes as $attribute => $value) {
                 $this->assertEquals($link->getAttribute($attribute), '');
             }
+
+            $this->assertEquals($link->getAttribute('target'), '_blank');
         }
 
         # Change condition `attributes`
