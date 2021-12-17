@@ -259,36 +259,6 @@ class Gesetz
 
 
     /**
-     * Extracts legal norms from text
-     *
-     * @param string $string Text
-     * @return array Formatted regex matches
-     */
-    public static function extract(string $string): array
-    {
-        # Look for legal norms in text
-        if (preg_match_all(self::$pattern, $string, $matches)) {
-            # Create data array
-            $data = [];
-
-            foreach ($matches[0] as $index => $match) {
-                $array = ['match' => $match];
-
-                foreach (array_slice($matches, 1) as $i => $results) {
-                    $array[self::$groups[$i]] = $results[$index];
-                }
-
-                $data[] = $array;
-            }
-
-            return $data;
-        }
-
-        return [];
-    }
-
-
-    /**
      * Transforms legal references into HTML link tags
      *
      * @param string $string Unprocessed text
@@ -296,18 +266,17 @@ class Gesetz
      */
     public function linkify(string $string): string
     {
-        # Extract matching legal norms
-        $matches = self::extract($string);
+        return preg_replace_callback(self::$pattern, function(array $matches): string {
+            # Create match array, consisting of ..
+            $match = array_merge(
+                # (1) .. full match (first entry)
+                ['match' => $matches[0]],
 
-        # If none were found ..
-        if (empty($matches)) {
-            # .. return original text
-            return $string;
-        }
+                # (2) .. combined capture group names & remaining entries
+                array_combine(self::$groups, array_slice($matches, 1))
+            );
 
-        # Iterate over matches ..
-        foreach ($matches as $match) {
-            # .. and drivers for each match ..
+            # Iterate over drivers for each match ..
             foreach ($this->drivers as $driver => $object) {
                 # (1) .. skipping blocked drivers
                 if (in_array($driver, $this->blockList)) {
@@ -339,7 +308,7 @@ class Gesetz
             }
 
             if (!isset($attributes['href'])) {
-                continue;
+                return $matches[0];
             }
 
             # Build `a` tag
@@ -349,12 +318,7 @@ class Gesetz
             }, array_keys($attributes), array_values($attributes));
 
             # (2) Combine everything
-            $link = '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
-
-            # Replace matched legal norm with its `a` tag
-            $string = str_replace($match['match'], $link, $string);
-        }
-
-        return $string;
+            return '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
+        }, $string);
     }
 }

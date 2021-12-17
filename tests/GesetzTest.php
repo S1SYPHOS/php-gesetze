@@ -389,49 +389,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testExtract(): void
-    {
-        # Setup
-        # (1) Norms
-        $norms = [
-            # Note: Despite using a section sign instead of 'Art(ikel)', this works!
-            '§ 1 GG'   => [
-                'match'  => '§ 1 GG',
-                'norm'   => '1',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'GG',
-            ],
-            '§ 1 BGB' => [
-                'match'  => '§ 1 BGB',
-                'norm'   => '1',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'BGB',
-            ],
-            '§§ 133, 157 BGB' => [
-                'match'  => '§§ 133, 157 BGB',
-                'norm'   => '133',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'BGB',
-            ],
-        ];
-
-        # Run function
-        foreach ($norms as $match => $data) {
-            # Assert result
-            $this->assertEquals([$data], \S1SYPHOS\Gesetze\Gesetz::extract($match));
-        }
-    }
-
-
     public function testLinkify(): void
     {
         # Setup

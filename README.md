@@ -83,54 +83,6 @@ echo \S1SYPHOS\Gesetze\Gesetz::roman2arabic('IX');
 ```
 
 
-### `extract(string $string, bool $roman2arabic = false): array`
-
-Extracts legal norms from text:
-
-```php
-var_dump(\S1SYPHOS\Gesetze\Gesetz::extract('This is a simple text, featuring § 1 I Nr. 1 BGB as well as Art. 4 GG'));
-
-# array(2) {
-#   [0]=>
-#   array(7) {
-#       ["match"]=>
-#       string(19) "§ 1 I Nr. 1 BGB"
-#       ["norm"]=>
-#       string(4) "1"
-#       ["absatz"]=>
-#       string(1) "I"
-#       ["satz"]=>
-#       string(0) ""
-#       ["nr"]=>
-#       string(1) "1"
-#       ["lit"]=>
-#       string(0) ""
-#       ["gesetz"]=>
-#       string(3) "BGB"
-#     }
-#   }
-#   [1]=>
-#   array(7) {
-#       ["match"]=>
-#       string(14) "Art. 4 GG"
-#       ["norm"]=>
-#       string(2) "4"
-#       ["absatz"]=>
-#       string(0) ""
-#       ["satz"]=>
-#       string(0) ""
-#       ["nr"]=>
-#       string(0) ""
-#       ["lit"]=>
-#       string(0) ""
-#       ["gesetz"]=>
-#       string(2) "GG"
-#     }
-#   }
-# }
-```
-
-
 ### `linkify(string $string): string`
 
 Transforms legal references into HTML link tags:
