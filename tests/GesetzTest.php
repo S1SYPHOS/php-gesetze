@@ -517,6 +517,48 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testLinkifyAttributes()
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) HTML document
+        $dom = new \DOMDocument;
+
+        # (3) Attributes
+        $attributes = [
+            'attr1' => 'some-value',
+            'attr2' => 'other-value',
+        ];
+
+        # Run function #1
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links1 = $dom->getElementsByTagName('a');
+
+        foreach ($links1 as $link) {
+            # Assert result
+            foreach ($attributes as $attribute => $value) {
+                $this->assertEquals($link->getAttribute($attribute), '');
+            }
+        }
+
+        # Change condition `attributes`
+        $object->attributes = $attributes;
+
+        # Run function #2
+        @$dom->loadHTML($object->linkify(self::$text));
+        $links2 = $dom->getElementsByTagName('a');
+
+        foreach ($links2 as $link) {
+            # Assert result
+            foreach ($attributes as $attribute => $value) {
+                $this->assertEquals($link->getAttribute($attribute), $value);
+            }
+        }
+    }
+
+
     public function testRoman2ArabicInvalid()
     {
         # Setup
