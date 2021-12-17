@@ -14,7 +14,13 @@ Upon invoking the main class, you may specify your preferred provider (or 'drive
 $object = new \S1SYPHOS\Gesetze\Gesetz('dejure');
 ```
 
-**Note:** This option defaults to `gesetze`, which is a good overall choice, simply because of the vast array of supported laws. However, other possible values are `'dejure'`, `'buzer'` & `'lexparency'`.
+It's also possible to specify your desired order of two or more drivers as array:
+
+```php
+$object = new \S1SYPHOS\Gesetze\Gesetz(['dejure', 'buzer']);
+```
+
+**Note:** This option defaults to `gesetze`, which is a good overall choice, simply because of the vast array of supported laws. However, other possible values are `'dejure'`, `'buzer'` and `'lexparency'`.
 
 Out of the box, `php-gesetze` cycles through all known drivers until a match is found. If you want to exclude certain drivers, have a look at the `$object->blockList` option.
 
