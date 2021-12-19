@@ -3,7 +3,7 @@
 /**
  * Linking german legal norms, dependency-free & GDPR-friendly.
  *
- * @link https://github.com/S1SYPHOS/php-gesetze
+ * @link https://codeberg.org/S1SYPHOS/php-gesetze
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  * @version 0.5.0
  */
