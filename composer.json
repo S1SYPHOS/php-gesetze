@@ -14,13 +14,17 @@
     "authors": [
         {
             "name": "Martin Folkers",
+            "email": "hello@twobrain.io",
             "homepage": "https://twobrain.io",
             "role": "Maintainer"
         }
     ],
+    "require": {
+        "php": "^7.4|^8.0"
+    },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.14",
-        "phpunit/phpunit": "^9.5"
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpunit/phpunit": "^8.5|^9.0"
     },
     "autoload": {
         "psr-4": {

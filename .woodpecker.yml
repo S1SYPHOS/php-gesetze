@@ -2,18 +2,13 @@ pipeline:
   build:
     image: jitesoft/composer:${PHP}
     commands:
-      - composer require phpunit/phpunit ^${UNIT} --with-all-dependencies
+      - composer install
       - composer run test
 
 matrix:
-  include:
-    - PHP: 7.3
-      UNIT: 8.0
-    - PHP: 7.4
-      UNIT: 8.0
-    - PHP: 8.0
-      UNIT: 9.0
-    - PHP: latest
-      UNIT: 9.0
+  PHP:
+    - 7.4
+    - 8.0
+    - 8.1
 
 branches: main
