@@ -35,7 +35,8 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $text .= '<div>';
         $text .= 'This is a <strong>simple</strong> HTML text.';
         $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
-        $text .= '.. or § 433 II BGB!';
+        $text .= '<span class="§ 1">&sect; 1 ZPO</span> was there even before them!';
+        $text .= '.. or § 433 II BGB! It also refers to § 1 of some legal document.';
         $text .= 'At the same time, there are invalid ones, like ..';
         $text .= '§ 1a BGB and § 1 GGGG ..';
         $text .= '.. and what european law, like Art. 2 Abs. 2 DSGVO?';
@@ -175,6 +176,48 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Setup
         # (1) Norms
         $norms = [
+            # Section sign
+            '§ 1 BGB' => [
+                'norm'   => '1',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
+            '§§ 1 BGB' => [
+                'norm'   => '1',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
+            '<span>&sect; 1 BGB</span>' => [
+                'norm'   => '1',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
+            'Artikel 1 BGB' => [
+                'norm'   => '1',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
+            'Art. 1 BGB' => [
+                'norm'   => '1',
+                'absatz' => '',
+                'satz'   => '',
+                'nr'     => '',
+                'lit'    => '',
+                'gesetz' => 'BGB',
+            ],
+
             # Section
             '§ 1 BGB' => [
                 'norm'   => '1',
@@ -191,54 +234,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
                 'nr'     => '',
                 'lit'    => '',
                 'gesetz' => 'BGB',
-            ],
-            '§§ 1 BGB' => [
-                'norm'   => '1',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'BGB',
-            ],
-            '§§ 1a BGB' => [
-                'norm'   => '1a',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'BGB',
-            ],
-            'Artikel 12 GG' => [
-                'norm'   => '12',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'GG',
-            ],
-            'Artikel 12a GG' => [
-                'norm'   => '12a',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'GG',
-            ],
-            'Art. 12 GG' => [
-                'norm'   => '12',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'GG',
-            ],
-            'Art. 12a GG' => [
-                'norm'   => '12a',
-                'absatz' => '',
-                'satz'   => '',
-                'nr'     => '',
-                'lit'    => '',
-                'gesetz' => 'GG',
             ],
 
             # Subsection
@@ -410,7 +405,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(3, count($result2));
+        $this->assertEquals(4, count($result2));
     }
 
 
@@ -448,7 +443,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
-        $this->assertEquals(2, count($result2));
+        $this->assertEquals(3, count($result2));
     }
 
 
@@ -464,19 +459,24 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # (3) `Title` attributes
         $titles = [
             'Art. 12 Abs. 1 GG' => [
-                'light' => 'GG',
+                'light'  => 'GG',
                 'normal' => 'Grundgesetz für die Bundesrepublik Deutschland',
-                'full' => 'Art 12',
+                'full'   => 'Art 12',
+            ],
+            '§ 1 ZPO' => [
+                'light'  => 'ZPO',
+                'normal' => 'Zivilprozessordnung',
+                'full'   => '§ 1 Sachliche Zuständigkeit',
             ],
             '§ 433 II BGB' => [
-                'light' => 'BGB',
+                'light'  => 'BGB',
                 'normal' => 'Bürgerliches Gesetzbuch',
-                'full' => '§ 433 Vertragstypische Pflichten beim Kaufvertrag',
+                'full'   => '§ 433 Vertragstypische Pflichten beim Kaufvertrag',
             ],
             'Art. 2 Abs. 2 DSGVO' => [
-                'light' => 'DSGVO',
+                'light'  => 'DSGVO',
                 'normal' => 'Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 zum Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten, zum freien Datenverkehr und zur Aufhebung der Richtlinie 95/46/EG',
-                'full' => 'Art.  2 Sachlicher Anwendungsbereich',
+                'full'   => 'Art.  2 Sachlicher Anwendungsbereich',
             ],
         ];
 

@@ -49,7 +49,7 @@ class Gesetz
         # Start
         . '/'
         # Section sign
-        . '(?:(?:§)+|Art\.?|Artikel)\s*'
+        . '(?:§+|&sect;|Art\.?|Artikel)\s*'
         # Section ('Norm')
         . '(\d+(?:\w\b)?)\s*'
         # Subsection ('Absatz')
