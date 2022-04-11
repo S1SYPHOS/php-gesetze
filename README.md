@@ -98,7 +98,7 @@ echo \S1SYPHOS\Gesetze\Gesetz::roman2arabic('IX');
 ```
 
 
-### `linkify(string $string): string`
+### `linkify(string $string, callable $callback): string`
 
 Transforms legal references into HTML link tags:
 
@@ -109,6 +109,8 @@ echo $obj->linkify('This is a simple text, featuring § 1 I Nr. 1 BGB as well as
 
 # This is a simple text, featuring <a href="https://www.gesetze-im-internet.de/bgb/__1.html" title="§ 1 Beginn der Rechtsfähigkeit">§ 1 I Nr. 1 BGB</a> as well as Art. 4c GG
 ```
+
+**Note:** For more flexibility, you may use your own `callback` method as second parameter of `linkify`. Callbacks are being passed arrays representing matched legal norms. This way, you could highlight them using `<strong>` tags instead of converting them into `a` tags. Default: (private) method `matchify`
 
 
 ## Example

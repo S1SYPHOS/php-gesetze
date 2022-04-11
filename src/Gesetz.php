@@ -259,66 +259,78 @@ class Gesetz
 
 
     /**
+     *
+     */
+    private function matchify(array $matches): string
+    {
+        # Create match array, consisting of ..
+        $match = array_merge(
+            # (1) .. full match (first entry)
+            ['match' => $matches[0]],
+
+            # (2) .. combined capture group names & remaining entries
+            array_combine(self::$groups, array_slice($matches, 1))
+        );
+
+        # Iterate over drivers for each match ..
+        foreach ($this->drivers as $driver => $object) {
+            # (1) .. skipping blocked drivers
+            if (in_array($driver, $this->blockList)) {
+                continue;
+            }
+
+            # (2).. blocking invalid laws & legal norms
+            if (!$object->validate($match)) {
+                continue;
+            }
+
+            # Build `a` tag attributes
+            # (1) Set defaults
+            $attributes = $this->attributes;
+
+            # (2) Determine `href` attribute
+            $attributes['href'] = $object->buildURL($match);
+
+            # (3) Determine `title` attribute
+            $attributes['title'] = $object->buildTitle($match, $this->title);
+
+            # (4) Provide fallback for `target` attribute
+            if (!isset($attributes['target'])) {
+                $attributes['target'] = '_blank';
+            }
+
+            # Abort the loop
+            break;
+        }
+
+        if (!isset($attributes['href'])) {
+            return $matches[0];
+        }
+
+        # Build `a` tag
+        # (1) Format key-value pairs
+        $attributes = array_map(function($key, $value) {
+            return sprintf('%s="%s"', $key, $value);
+        }, array_keys($attributes), array_values($attributes));
+
+        # (2) Combine everything
+        return '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
+    }
+
+
+    /**
      * Transforms legal references into HTML link tags
      *
      * @param string $string Unprocessed text
+     * @param callable $callback Callback function
      * @return string Processed text
      */
-    public function linkify(string $string): string
+    public function linkify(string $string, ?callable $callback = null): string
     {
-        return preg_replace_callback(self::$pattern, function(array $matches): string {
-            # Create match array, consisting of ..
-            $match = array_merge(
-                # (1) .. full match (first entry)
-                ['match' => $matches[0]],
+        if (is_null($callback)) {
+            $callback = [$this, 'matchify'];
+        }
 
-                # (2) .. combined capture group names & remaining entries
-                array_combine(self::$groups, array_slice($matches, 1))
-            );
-
-            # Iterate over drivers for each match ..
-            foreach ($this->drivers as $driver => $object) {
-                # (1) .. skipping blocked drivers
-                if (in_array($driver, $this->blockList)) {
-                    continue;
-                }
-
-                # (2).. blocking invalid laws & legal norms
-                if (!$object->validate($match)) {
-                    continue;
-                }
-
-                # Build `a` tag attributes
-                # (1) Set defaults
-                $attributes = $this->attributes;
-
-                # (2) Determine `href` attribute
-                $attributes['href'] = $object->buildURL($match);
-
-                # (3) Determine `title` attribute
-                $attributes['title'] = $object->buildTitle($match, $this->title);
-
-                # (4) Provide fallback for `target` attribute
-                if (!isset($attributes['target'])) {
-                    $attributes['target'] = '_blank';
-                }
-
-                # Abort the loop
-                break;
-            }
-
-            if (!isset($attributes['href'])) {
-                return $matches[0];
-            }
-
-            # Build `a` tag
-            # (1) Format key-value pairs
-            $attributes = array_map(function($key, $value) {
-                return sprintf('%s="%s"', $key, $value);
-            }, array_keys($attributes), array_values($attributes));
-
-            # (2) Combine everything
-            return '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
-        }, $string);
+        return preg_replace_callback(self::$pattern, $callback, $string);
     }
 }

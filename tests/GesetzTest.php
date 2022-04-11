@@ -331,6 +331,37 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testLinkifyCallback(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) HTML document
+        $dom = new \DOMDocument;
+
+        # (3) Callback function
+        $callback = function(array $match): string
+        {
+            return sprintf('<strong>%s</strong>', $match[0]);
+        };
+
+        # Run function #1
+        @$dom->loadHTML(self::$text);
+        $result1 = $dom->getElementsByTagName('strong');
+
+        # Assert result
+        $this->assertEquals(1, count($result1));
+
+        # Run function #2
+        @$dom->loadHTML($object->linkify(self::$text, $callback));
+        $result2 = $dom->getElementsByTagName('strong');
+
+        # Assert result
+        $this->assertEquals(7, count($result2));
+    }
+
+
     public function testLinkifyBlockList(): void
     {    # Setup
         # (1) Instance
