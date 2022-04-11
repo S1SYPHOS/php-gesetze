@@ -259,9 +259,12 @@ class Gesetz
 
 
     /**
+     * Converts matched legal reference into `a` tag
      *
+     * @param array $matches Matched legal norm
+     * @return string
      */
-    private function matchify(array $matches): string
+    private function linkify(array $matches): string
     {
         # Create match array, consisting of ..
         $match = array_merge(
@@ -319,16 +322,16 @@ class Gesetz
 
 
     /**
-     * Transforms legal references into HTML link tags
+     * Converts legal references throughout text into `a` tags
      *
      * @param string $string Unprocessed text
      * @param callable $callback Callback function
      * @return string Processed text
      */
-    public function linkify(string $string, ?callable $callback = null): string
+    public function gesetzify(string $string, ?callable $callback = null): string
     {
         if (is_null($callback)) {
-            $callback = [$this, 'matchify'];
+            $callback = [$this, 'linkify'];
         }
 
         return preg_replace_callback(self::$pattern, $callback, $string);

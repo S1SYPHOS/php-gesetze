@@ -306,7 +306,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLinkify(): void
+    public function testGesetzify(): void
     {
         # Setup
         # (1) Instance
@@ -323,7 +323,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, count($result1));
 
         # Run function #2
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
@@ -331,7 +331,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLinkifyCallback(): void
+    public function testGesetzifyCallback(): void
     {
         # Setup
         # (1) Instance
@@ -354,7 +354,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, count($result1));
 
         # Run function #2
-        @$dom->loadHTML($object->linkify(self::$text, $callback));
+        @$dom->loadHTML($object->gesetzify(self::$text, $callback));
         $result2 = $dom->getElementsByTagName('strong');
 
         # Assert result
@@ -362,7 +362,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLinkifyBlockList(): void
+    public function testGesetzifyBlockList(): void
     {    # Setup
         # (1) Instance
         $object = new \S1SYPHOS\Gesetze\Gesetz();
@@ -379,7 +379,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function #1
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $result1 = $dom->getElementsByTagName('a');
 
         # Assert result
@@ -392,7 +392,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function #2
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
@@ -400,7 +400,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLinkifyTitle()
+    public function testGesetzifyTitle()
     {
         # Setup
         # (1) Instance
@@ -435,7 +435,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
 
 
         # Run function #1
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links1 = $dom->getElementsByTagName('a');
 
         foreach ($links1 as $link) {
@@ -447,7 +447,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $object->title = 'light';
 
         # Run function #2
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links2 = $dom->getElementsByTagName('a');
 
         foreach ($links2 as $link) {
@@ -459,7 +459,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $object->title = 'normal';
 
         # Run function #3
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links3 = $dom->getElementsByTagName('a');
 
         foreach ($links3 as $link) {
@@ -471,7 +471,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $object->title = 'full';
 
         # Run function #4
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links4 = $dom->getElementsByTagName('a');
 
         foreach ($links4 as $link) {
@@ -481,7 +481,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLinkifyAttributes()
+    public function testGesetzifyAttributes()
     {
         # Setup
         # (1) Instance
@@ -497,7 +497,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function #1
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links1 = $dom->getElementsByTagName('a');
 
         foreach ($links1 as $link) {
@@ -513,7 +513,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $object->attributes = $attributes;
 
         # Run function #2
-        @$dom->loadHTML($object->linkify(self::$text));
+        @$dom->loadHTML($object->gesetzify(self::$text));
         $links2 = $dom->getElementsByTagName('a');
 
         foreach ($links2 as $link) {
