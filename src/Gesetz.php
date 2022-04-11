@@ -213,7 +213,7 @@ class Gesetz
     public static function analyze(string $string): array
     {
         if (preg_match(self::$pattern, $string, $matches)) {
-            return array_combine(self::$groups, array_slice($matches, 1));
+            return array_filter(array_combine(self::$groups, array_slice($matches, 1)));
         }
 
         return [];
