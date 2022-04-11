@@ -6,6 +6,15 @@ Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` autom
 There's also a Python port of this library, called [`py-gesetze`](https://codeberg.org/S1SYPHOS/py-gesetze).
 
 
+## Installation
+
+It's available for [Composer](https://getcomposer.org):
+
+```text
+composer require s1syphos/php-gesetze
+```
+
+
 ## Getting started
 
 Upon invoking the main class, you may specify your preferred provider (or 'driver'), like this:
