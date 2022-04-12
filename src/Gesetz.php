@@ -205,6 +205,18 @@ class Gesetz
 
 
     /**
+     * Creates match array
+     *
+     * @param string $string Legal norm
+     * @return array Formatted regex match
+     */
+    private static function groupMatch(array $match): array
+    {
+        return array_combine(self::$groups, array_slice($match, 1));
+    }
+
+
+    /**
      * Analyzes a single legal norm
      *
      * @param string $string Legal norm
@@ -213,7 +225,7 @@ class Gesetz
     public static function analyze(string $string): array
     {
         if (preg_match(self::$pattern, $string, $matches)) {
-            return array_filter(array_combine(self::$groups, array_slice($matches, 1)));
+            return array_filter(self::groupMatch($matches));
         }
 
         return [];
@@ -259,6 +271,20 @@ class Gesetz
 
 
     /**
+     * Extracts legal norms as array of strings
+     *
+     * @param string $string Text
+     * @return array
+     */
+    public function extract(string $string): array
+    {
+        preg_match_all(self::$pattern, $string, $matches);
+
+        return $matches[0];
+    }
+
+
+    /**
      * Converts matched legal reference into `a` tag
      *
      * @param array $matches Matched legal norm
@@ -272,7 +298,7 @@ class Gesetz
             ['match' => $matches[0]],
 
             # (2) .. combined capture group names & remaining entries
-            array_combine(self::$groups, array_slice($matches, 1))
+            self::groupMatch($matches)
         );
 
         # Iterate over drivers for each match ..

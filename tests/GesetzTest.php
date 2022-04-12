@@ -35,7 +35,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $text .= '<div>';
         $text .= 'This is a <strong>simple</strong> HTML text.';
         $text .= 'It contains legal norms, like Art. 12 Abs. 1 GG ..';
-        $text .= '<span class="§ 1">&sect; 1 ZPO</span> was there even before them!';
+        $text .= '<span class="§ 1">&sect; 1 ZPO</span> was there even before them!' . "\n";
         $text .= '.. or § 433 II BGB! It also refers to § 1 of some legal document.';
         $text .= 'At the same time, there are invalid ones, like ..';
         $text .= '§ 1a BGB and § 1 GGGG ..';
@@ -303,6 +303,29 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             # Assert result
             $this->assertEquals($meta, \S1SYPHOS\Gesetze\Gesetz::analyze($full));
         }
+    }
+
+
+    public function testExtract(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) Extracted legal norms
+        $expected = [
+            'Art. 12 Abs. 1 GG',
+            '&sect; 1 ZPO',
+            '§ 433 II BGB',
+            '§ 1a BGB',
+            '§ 1 GGGG',
+            'Art. 2 Abs. 2 DSGVO',
+        ];
+
+        # Run function
+        $result = $object->extract(self::$text);
+
+        $this->assertEquals($result, $expected);
     }
 
 

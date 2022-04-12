@@ -98,6 +98,26 @@ echo \S1SYPHOS\Gesetze\Gesetz::roman2arabic('IX');
 ```
 
 
+### `extract(string $string): array`
+
+Extracts legal norms as array of strings:
+
+```php
+$obj = new \S1SYPHOS\Gesetze\Gesetz();
+
+$result = $obj->extract('This string contains Art. 12 Abs. 1 GG and Art. 2 Abs. 2 DSGVO - for educational purposes only.')
+
+var_dump($result);
+
+# array(2) {
+#   [0]=>
+#   string(17) "Art. 12 Abs. 1 GG"
+#   [1]=>
+#   string(19) "Art. 2 Abs. 2 DSGVO"
+# }
+```
+
+
 ### `gesetzify(string $string, callable $callback): string`
 
 Transforms legal references into HTML link tags:
