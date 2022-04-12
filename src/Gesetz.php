@@ -245,28 +245,21 @@ class Gesetz
             return false;
         }
 
-        # Set default
-        $validity = false;
-
         # Iterate over drivers ..
         foreach ($this->drivers as $driver => $object) {
-            # (1) .. skipping blocked drivers
+            # .. skipping blocked drivers
             if (in_array($driver, $this->blockList)) {
                 continue;
             }
 
-            # (2) .. validating legal norm
+            # If legal norm checks out ..
             if ($object->validate(self::analyze($string))) {
-                # Upon first hit ..
-                # (1) .. affirm its validity
-                $validity = true;
-
-                # (2) .. abort the loop
-                break;
+                # .. break the loop
+                return true;
             }
         }
 
-        return $validity;
+        return false;
     }
 
 

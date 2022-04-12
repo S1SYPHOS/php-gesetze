@@ -359,9 +359,30 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function
-        foreach ($norms as $norm => $result) {
+        foreach ($norms as $norm => $expected) {
             # Assert result
-            $this->assertEquals($result, $object->validate($norm));
+            $this->assertEquals($expected, $object->validate($norm));
+        }
+    }
+
+
+    public function testValidateEmpty(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) Norms
+        $norms = [
+            '',
+            '§ 1 by itself == useless',
+            'This is for educational purposes only',
+        ];
+
+        # Run function
+        foreach ($norms as $norm) {
+            # Assert result
+            $this->assertEquals(false, $object->validate($norm));
         }
     }
 

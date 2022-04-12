@@ -62,6 +62,11 @@ abstract class Driver
      */
     public function validate(array $array): bool
     {
+        # Fail early when match is empty
+        if (!in_array('gesetz', array_keys($array))) {
+            return false;
+        }
+
         # Get lowercase identifier for current law
         $identifier = strtolower($array['gesetz']);
 
