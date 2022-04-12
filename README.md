@@ -65,14 +65,14 @@ var_dump($result);
 ```
 
 
-### `validate(array $array): bool`
+### `validate(string $string): bool`
 
-Validates a single legal norm (across all providers):
+Validates a single legal norm (across all providers - unless `blockList`ed):
 
 ```php
 $obj = new \S1SYPHOS\Gesetze\Gesetz();
 
-var_dump($obj->validate($obj::analyze('§ 433 II BGB')));
+var_dump($obj->validate('§ 433 II BGB'));
 
 # bool(true)
 
@@ -210,13 +210,6 @@ Controls `title` attribute:
 | `'light'`  | abbreviated law (eg 'GG')          |
 | `'normal'` | complete law (eg 'Grundgesetz')    |
 | `'full'`   | official heading (eg 'Artikel 12') |
-
-
-### `$object->validate (bool)`
-
-Defines whether laws & legal norms should be validated upon extracting / linking - default to `true`. When `false`, legal norms like `'Art. 1 GGGG'` (invalid law) or `'Art. 12a GG'` (invalid norm) would be seen as valid and therefore be extracted / linked.
-
-**Note:** In this case, it is strongly recommended to avoid setting `$object->title` to `'full'` - you have been warned!
 
 
 ## Credits

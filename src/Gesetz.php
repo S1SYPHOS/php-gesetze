@@ -235,13 +235,13 @@ class Gesetz
     /**
      * Validates a single legal norm (across all providers)
      *
-     * @param array $array Formatted regex match
-     * @return bool Validity of legal norm
+     * @param string $string Legal norm
+     * @return bool Whether legal norm is valid (with regard to its 'linkability')
      */
-    public function validate(array $array): bool
+    public function validate(string $string): bool
     {
-        # Fail early when regex match is empty
-        if (empty($array)) {
+        # Fail early when string is empty
+        if (empty($string)) {
             return false;
         }
 
@@ -256,7 +256,7 @@ class Gesetz
             }
 
             # (2) .. validating legal norm
-            if ($object->validate($array)) {
+            if ($object->validate(self::analyze($string))) {
                 # Upon first hit ..
                 # (1) .. affirm its validity
                 $validity = true;

@@ -346,6 +346,53 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testValidate(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) Legal norms
+        $norms = [
+            '§ 433 BGB' => true,
+            '§ 1a BGB' => false,
+        ];
+
+        # Run function
+        foreach ($norms as $norm => $result) {
+            # Assert result
+            $this->assertEquals($result, $object->validate($norm));
+        }
+    }
+
+
+    public function testValidateBlockList(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) Legal norms
+        $norms = [
+            '§ 433 BGB',
+            '§ 1a BGB',
+        ];
+
+        # (3) Configure blocklist
+        $object->blockList = [
+            'buzer',
+            'dejure',
+            'gesetze',
+        ];
+
+        # Run function
+        foreach ($norms as $norm) {
+            # Assert result
+            $this->assertEquals(false, $object->validate($norm));
+        }
+    }
+
+
     public function testExtract(): void
     {
         # Setup
