@@ -15,9 +15,19 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
      */
 
     /**
+     * Text (with legal references)
+     *
      * @var string
      */
     private static $text;
+
+
+    /**
+     * Text (without legal references)
+     *
+     * @var string
+     */
+    private static $emptyText;
 
 
     /**
@@ -27,7 +37,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         # Setup
-        # (1) Text
+        # (1) Text (with legal references)
         # (a) Enforce UTF-8 encoding
         $text = '<!DOCTYPE html><meta charset="UTF-8">';
 
@@ -43,6 +53,18 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $text .= '</div>';
 
         self::$text = $text;
+
+        # (2) Text (without legal references)
+        # (a) Enforce UTF-8 encoding
+        $text = '<!DOCTYPE html><meta charset="UTF-8">';
+
+        # (b) Insert test string
+        $text .= '<div>';
+        $text .= 'This text comes without legal references,' . "\n";
+        $text .= 'because § 1 by itself does not mean anything!';
+        $text .= '</div>';
+
+        self::$emptyText = $text;
     }
 
 
@@ -306,6 +328,24 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testAnalyzeEmpty(): void
+    {
+        # Setup
+        # (1) Norms
+        $norms = [
+            '',
+            '§ 1 by itself == useless',
+            'This is for educational purposes only',
+        ];
+
+        # Run function
+        foreach ($norms as $norm) {
+            # Assert result
+            $this->assertEquals([], \S1SYPHOS\Gesetze\Gesetz::analyze($norm));
+        }
+    }
+
+
     public function testExtract(): void
     {
         # Setup
@@ -325,7 +365,22 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         $result = $object->extract(self::$text);
 
+        # Assert result
         $this->assertEquals($result, $expected);
+    }
+
+
+    public function testExtractEmpty(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # Run function
+        $result = $object->extract(self::$emptyText);
+
+        # Assert result
+        $this->assertEquals($result, []);
     }
 
 
@@ -351,6 +406,23 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertEquals(4, count($result2));
+    }
+
+
+    public function testGesetzifyEmpty(): void
+    {
+        # Setup
+        # (1) Instance
+        $object = new \S1SYPHOS\Gesetze\Gesetz();
+
+        # (2) HTML document
+        $dom = new \DOMDocument;
+
+        # Run function #
+        $result = $object->gesetzify(self::$emptyText);
+
+        # Assert result
+        $this->assertEquals($result, self::$emptyText);
     }
 
 
