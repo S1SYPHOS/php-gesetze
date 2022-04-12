@@ -128,5 +128,5 @@ abstract class Driver
      * @param array $array Formatted regex match
      * @return string
      */
-    abstract protected function buildURL(array $array): string;
+    abstract public function buildURL(array $array): string;
 }
