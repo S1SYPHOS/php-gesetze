@@ -10,6 +10,10 @@
 
 namespace S1SYPHOS\Gesetze;
 
+use S1SYPHOS\Gesetze\Drivers\Drivers;
+
+use Exception;
+
 
 /**
  * Class Gesetz
@@ -28,14 +32,6 @@ class Gesetz
      * @var array
      */
     public $drivers = [];
-
-
-    /**
-     * Blocked providers
-     *
-     * @var array
-     */
-    public $blockList = [];
 
 
     /**
@@ -73,7 +69,7 @@ class Gesetz
      *
      * @var array
      */
-    private static $groups = [
+    public static $groups = [
         'norm',
         'absatz',
         'satz',
@@ -108,22 +104,21 @@ class Gesetz
     /**
      * Constructor
      *
-     * @param mixed $driver Provider identifier
+     * @param mixed $order Provider identifier
      * @return void
+     * @throws \Exception
      */
-    public function __construct($order = 'gesetze')
+    public function __construct($order = null)
     {
-        # List available drivers
-        $drivers = [
-            # (1) 'gesetze-im-internet.de'
-            'gesetze' => '\S1SYPHOS\Gesetze\Drivers\GesetzeImInternet',
-            # (2) 'dejure.org'
-            'dejure' => '\S1SYPHOS\Gesetze\Drivers\DejureOnline',
-            # (3) 'buzer.de'
-            'buzer' => '\S1SYPHOS\Gesetze\Drivers\Buzer',
-            # (4) 'lexparency.de'
-            'lexparency' => '\S1SYPHOS\Gesetze\Drivers\Lexparency',
-        ];
+        # Set default order
+        if (is_null($order)) {
+            $order = [
+                'gesetze',     # 'gesetze-im-internet.de'
+                'dejure',      # 'dejure.org'
+                'buzer',       # 'buzer.de'
+                'lexparency',  # 'lexparency.de'
+            ];
+        }
 
         # If string was passed as order ..
         if (is_string($order)) {
@@ -131,22 +126,16 @@ class Gesetz
             $order = [$order];
         }
 
-        # Iterate over available drivers ..
-        foreach (array_keys($drivers) as $driver) {
-            # .. but skip default one(s)
-            if (in_array($driver, $order)) {
-                continue;
-            }
-
-            # Add to order
-            $order[] = $driver;
-        }
-
-        # Initialize drivers
+        # Loop through selected drivers
         foreach ($order as $driver) {
-            if (in_array($driver, array_keys($drivers))) {
-                $this->drivers[$driver] = new $drivers[$driver]();
+            # If added before ..
+            if (isset($this->drivers[$driver])) {
+                # .. report duplicate driver
+                throw new Exception(sprintf('Driver already loaded: "%s"', $driver));
             }
+
+            # Initialize drivers
+            $this->drivers[$driver] = Drivers::factory($driver);
         }
     }
 
@@ -167,7 +156,7 @@ class Gesetz
         # If one of the characters represents an invalid roman numeral ..
         if (!preg_match('/[IVXLCDM]+/i', $string)) {
             # .. throw error
-            throw new \Exception('Input contains invalid character.');
+            throw new Exception('Input contains invalid character.');
         }
 
         # Transform string to uppercase
@@ -245,13 +234,8 @@ class Gesetz
             return false;
         }
 
-        # Iterate over drivers ..
+        # Iterate over drivers
         foreach ($this->drivers as $driver => $object) {
-            # .. skipping blocked drivers
-            if (in_array($driver, $this->blockList)) {
-                continue;
-            }
-
             # If legal norm checks out ..
             if ($object->validate(self::analyze($string))) {
                 # .. break the loop
@@ -296,12 +280,7 @@ class Gesetz
 
         # Iterate over drivers for each match ..
         foreach ($this->drivers as $driver => $object) {
-            # (1) .. skipping blocked drivers
-            if (in_array($driver, $this->blockList)) {
-                continue;
-            }
-
-            # (2).. blocking invalid laws & legal norms
+            # .. blocking invalid laws & legal norms
             if (!$object->validate($match)) {
                 continue;
             }

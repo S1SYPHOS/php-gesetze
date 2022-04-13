@@ -29,9 +29,9 @@ It's also possible to specify your desired order of two or more drivers as array
 $object = new \S1SYPHOS\Gesetze\Gesetz(['dejure', 'buzer']);
 ```
 
-**Note:** This option defaults to `gesetze`, which is a good overall choice, simply because of the vast array of supported laws. However, other possible values are `'dejure'`, `'buzer'` and `'lexparency'`.
+**Note:** This option defaults to all available drivers, which is a good overall choice, simply because of the vast array of supported laws. Possible values are `gesetze`, `'dejure'`, `'buzer'` and `'lexparency'`.
 
-Out of the box, `php-gesetze` cycles through all known drivers until a match is found. If you want to exclude certain drivers, have a look at the `$object->blockList` option.
+Out of the box, `php-gesetze` cycles through all known drivers until a match is found.
 
 
 ## Usage
@@ -67,7 +67,7 @@ var_dump($result);
 
 ### `validate(string $string): bool`
 
-Validates a single legal norm (across all providers - unless `blockList`ed):
+Validates a single legal norm (across all selected providers:
 
 ```php
 $obj = new \S1SYPHOS\Gesetze\Gesetz();
@@ -168,11 +168,6 @@ There are several settings you may use in order to change the behavior of the li
 ### `$object->drivers (array)`
 
 Associative array, holding all available drivers (already initialized), where the corresponding keys are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'`.
-
-
-### `$object->blockList (array)`
-
-Non-associative array, holding driver that should not be used when matching legal norms. Possible values are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'`.
 
 
 ### `$object::$pattern (string)`

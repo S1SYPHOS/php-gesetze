@@ -1,14 +1,16 @@
 <?php
 
-namespace S1SYPHOS\Gesetze\Drivers;
+namespace S1SYPHOS\Gesetze\Drivers\Driver;
+
+use S1SYPHOS\Gesetze\Drivers\Driver;
 
 
 /**
- * Class Lexparency
+ * Class DejureOnline
  *
- * Driver for 'lexparency.de'
+ * Driver for 'dejure.org'
  */
-class Lexparency extends Driver
+class DejureOnline extends Driver
 {
     /**
      * Properties
@@ -19,7 +21,7 @@ class Lexparency extends Driver
      *
      * @var string
      */
-    protected $identifier = 'lexparency';
+    protected $identifier = 'dejure';
 
 
     /**
@@ -39,8 +41,8 @@ class Lexparency extends Driver
         $identifier = strtolower($array['gesetz']);
 
         # Combine everything
-        return sprintf('https://lexparency.de/eu/%s/%s',
-            $this->library[$identifier]['slug'], 'ART_' . $array['norm']
+        return sprintf('https://dejure.org/gesetze/%s/%s',
+            $this->library[$identifier]['slug'], $array['norm'] . '.html'
         );
     }
 }

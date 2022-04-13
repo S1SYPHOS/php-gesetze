@@ -1,6 +1,8 @@
 <?php
 
-namespace S1SYPHOS\Gesetze\Drivers;
+namespace S1SYPHOS\Gesetze\Drivers\Driver;
+
+use S1SYPHOS\Gesetze\Drivers\Driver;
 
 
 /**
