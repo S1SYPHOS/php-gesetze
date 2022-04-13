@@ -160,30 +160,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    // public function testDriversInvalid(): void
-    // {
-    //     # Setup
-    //     # (1) Instance
-    //     $object = new Gesetz();
-
-    //     # (2) Invalid providers
-    //     $invalidDrivers = [
-    //         '',
-    //         '?!#@=',
-    //         'g3s3tz3',
-    //         'd3!ur3',
-    //     ];
-
-    //     # Assert exception
-    //     $this->expectException(Exception::class);
-
-    //     # Run function
-    //     foreach ($invalidDrivers as $driver) {
-    //         new Gesetz($driver);
-    //     }
-    // }
-
-
     public function testAnalyze(): void
     {
         # Setup
@@ -373,7 +349,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $norm) {
             # Assert result
-            $this->assertEquals($object->validate($norm), false);
+            $this->assertFalse($object->validate($norm));
         }
     }
 

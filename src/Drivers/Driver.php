@@ -2,6 +2,8 @@
 
 namespace S1SYPHOS\Gesetze\Drivers;
 
+use Exception;
+
 
 /**
  * Class Driver
@@ -33,16 +35,20 @@ abstract class Driver
     /**
      * Constructor
      *
+     * @param string $file Path to JSON index file
      * @return void
      * @throws \Exception
      */
-    public function __construct()
+    public function __construct(?string $file = null)
     {
-        # Determine data file
-        $file = sprintf('%s/../../data/%s.json', __DIR__, $this->identifier);
+        # Set default index file
+        if (is_null($file)) {
+            $file = sprintf('%s/../../data/%s.json', __DIR__, $this->identifier);
+        }
 
+        # Fail early if file does not exist
         if (!file_exists($file)) {
-            throw new \Exception(sprintf('File does not exist: "%s"', realpath($file)));
+            throw new Exception(sprintf('File does not exist: "%s"', realpath($file)));
         }
 
         # Load law library data
@@ -93,6 +99,17 @@ abstract class Driver
 
 
     /**
+     * Builds URL for corresponding legal norm
+     *
+     * Used as `href` attribute
+     *
+     * @param array $array Formatted regex match
+     * @return string
+     */
+    abstract public function buildURL(array $array): string;
+
+
+    /**
      * Builds description for corresponding legal norm
      *
      * Used as `title` attribute
@@ -100,11 +117,17 @@ abstract class Driver
      * @param array $array Formatted regex match
      * @param mixed $mode Mode of operation
      * @return string
+     * @throws \Exception
      */
-    public function buildTitle(array $array, $mode): string
+    public function buildTitle(array $array, $mode = null): string
     {
         # Get lowercase identifier for current law
         $identifier = strtolower($array['gesetz']);
+
+        # Fail early if law is unavailable
+        if (!isset($this->library[$identifier])) {
+            throw new Exception(sprintf('Invalid law: "%s"', $array['gesetz']));
+        }
 
         # Get data about current law
         $law = $this->library[$identifier];
@@ -123,15 +146,4 @@ abstract class Driver
 
         return '';
     }
-
-
-    /**
-     * Builds URL for corresponding legal norm
-     *
-     * Used as `href` attribute
-     *
-     * @param array $array Formatted regex match
-     * @return string
-     */
-    abstract public function buildURL(array $array): string;
 }
