@@ -20,10 +20,10 @@ class AbstractDriverTest extends \S1SYPHOS\Gesetze\Drivers\Driver {
      *
      * Used as `href` attribute
      *
-     * @param array $array Formatted regex match
+     * @param string|array $string Matched text OR formatted regex match
      * @return string
      */
-    public function buildURL(array $array): string {}
+    public function buildURL($data): string {}
 }
 
 
@@ -34,6 +34,10 @@ class AbstractDriverTest extends \S1SYPHOS\Gesetze\Drivers\Driver {
  */
 class DriverTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Tests
+     */
+
     public function testInitInvalid(): void
     {
         # Assert exception

@@ -2,6 +2,8 @@
 
 namespace S1SYPHOS\Gesetze\Drivers;
 
+use S1SYPHOS\Gesetze\Traits\Regex;
+
 use Exception;
 
 
@@ -12,6 +14,13 @@ use Exception;
  */
 abstract class Driver
 {
+    /**
+     * Traits
+     */
+
+    use Regex;
+
+
     /**
      * Properties
      */
@@ -63,18 +72,23 @@ abstract class Driver
     /**
      * Validates a single legal norm
      *
-     * @param array $array Formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @return bool Validity of legal norm
      */
-    public function validate(array $array): bool
+    public function validate($data): bool
     {
-        # Fail early when match is empty
-        if (!in_array('gesetz', array_keys($array))) {
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
+        }
+
+        # Fail early if match is empty
+        if (empty($data)) {
             return false;
         }
 
         # Get lowercase identifier for current law
-        $identifier = strtolower($array['gesetz']);
+        $identifier = strtolower($data['gesetz']);
 
         # Check whether current law exists in library ..
         if (!isset($this->library[$identifier])) {
@@ -86,7 +100,7 @@ abstract class Driver
         $law = $this->library[$identifier];
 
         # Since `norm` is always a string ..
-        $norm = $array['norm'];
+        $norm = $data['norm'];
 
         # .. but PHP decodes JSON numeric keys as integer ..
         if (preg_match('/\b\d+\b/', $norm)) {
@@ -103,10 +117,10 @@ abstract class Driver
      *
      * Used as `href` attribute
      *
-     * @param array $array Formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @return string
      */
-    abstract public function buildURL(array $array): string;
+    abstract protected function buildURL($data): string;
 
 
     /**
@@ -114,20 +128,19 @@ abstract class Driver
      *
      * Used as `title` attribute
      *
-     * @param array $array Formatted regex match
-     * @param mixed $mode Mode of operation
+     * @param string|array $string Matched text OR formatted regex match
+     * @param string|false $mode Mode of operation
      * @return string
-     * @throws \Exception
      */
-    public function buildTitle(array $array, $mode = null): string
+    protected function buildTitle($data, $mode = null): string
     {
-        # Get lowercase identifier for current law
-        $identifier = strtolower($array['gesetz']);
-
-        # Fail early if law is unavailable
-        if (!isset($this->library[$identifier])) {
-            throw new Exception(sprintf('Invalid law: "%s"', $array['gesetz']));
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
         }
+
+        # Get lowercase identifier for current law
+        $identifier = strtolower($data['gesetz']);
 
         # Get data about current law
         $law = $this->library[$identifier];
@@ -141,9 +154,35 @@ abstract class Driver
                 return $law['title'];
 
             case 'full':
-                return $law['headings'][$array['norm']];
+                return $law['headings'][$data['norm']];
         }
 
         return '';
+    }
+
+
+    /**
+     * Builds HTML attributes for corresponding legal norm
+     *
+     * @param string|array $string Matched text OR formatted regex match
+     * @param string|false $mode Mode of operation
+     * @return array
+     */
+    public function buildAttributes($data, $mode = null): array
+    {
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
+        }
+
+        # Fail early if match is empty
+        if (empty($data)) {
+            return [];
+        }
+
+        return [
+            'href'  => $this->buildURL($data),
+            'title' => $this->buildTitle($data, $mode),
+        ];
     }
 }

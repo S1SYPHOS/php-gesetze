@@ -45,79 +45,53 @@ class GesetzeImInternetTest extends \PHPUnit\Framework\TestCase
     public function testValidate(): void
     {
         # Setup
+        # (1) Legal norms
+        $norms = [
+            '§ 433 BGB' => true,
+            '§ 1a BGB' => false,
+        ];
+
+        # Run function
+        foreach ($norms as $norm => $expected) {
+            # Assert result
+            $this->assertEquals(self::$object->validate($norm), $expected);
+        }
+    }
+
+
+    public function testValidateEmpty(): void
+    {
+        # Setup
         # (1) Norms
         $norms = [
-            ['norm' => '1', 'gesetz' => 'ZZZZZ'],
-            ['norm' => '1aa', 'gesetz' => 'BGB'],
-            ['norm' => '433', 'gesetz' => 'BGB'],
+            '',
+            '§ 1 by itself == useless',
+            'This is for educational purposes only',
         ];
 
         # Run function
         foreach ($norms as $norm) {
             # Assert result
-            $this->assertIsBool(self::$object->validate($norm));
+            $this->assertFalse(self::$object->validate($norm));
         }
     }
 
 
-    public function testBuildTitle(): void
+    public function testBuildAttributes(): void
     {
         # Setup
-        # (1) Norms
-        $norm = [
-            'norm'   => '433',
-            'gesetz' => 'BGB',
+        # (1) Norms ..
+        $norms = [
+            # .. as string
+            '§ 433 BGB',
+
+            # .. as array
+            ['norm'   => '433', 'gesetz' => 'BGB'],
         ];
 
-        # Assert result
-        $this->assertIsString(self::$object->buildTitle($norm));
-    }
-
-
-    public function testBuildTitleInvalid(): void
-    {
-        # Setup
-        # (1) Norm
-        $norm = [
-            'norm'   => '9999',
-            'gesetz' => 'ZZZZ',
-        ];
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function
-        self::$object->buildTitle($norm);
-    }
-
-
-    public function testBuildURL(): void
-    {
-        # Setup
-        # (1) Norm
-        $norm = [
-            'norm'   => '433',
-            'gesetz' => 'BGB',
-        ];
-
-        # Assert result
-        $this->assertIsString(self::$object->buildURL($norm));
-    }
-
-
-    public function testBuildURLInvalid(): void
-    {
-        # Setup
-        # (1) Norm
-        $norm = [
-            'norm'   => '9999',
-            'gesetz' => 'ZZZZ',
-        ];
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function
-        self::$object->buildURL($norm);
+        foreach ($norms as $norm) {
+            # Assert result
+            $this->assertIsArray(self::$object->buildAttributes($norm));
+        }
     }
 }

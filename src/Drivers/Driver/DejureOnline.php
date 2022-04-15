@@ -4,8 +4,6 @@ namespace S1SYPHOS\Gesetze\Drivers\Driver;
 
 use S1SYPHOS\Gesetze\Drivers\Driver;
 
-use Exception;
-
 
 /**
  * Class DejureOnline
@@ -35,22 +33,17 @@ class DejureOnline extends Driver
      *
      * Used as `href` attribute
      *
-     * @param array $array Formatted regex match
+     * @param string|array $string Matched text OR formatted regex match
      * @return string
      * @throws \Exception
      */
-    public function buildURL(array $array): string {
+    protected function buildURL($data): string {
         # Get lowercase identifier for current law
-        $identifier = strtolower($array['gesetz']);
-
-        # Fail early if law is unavailable
-        if (!isset($this->library[$identifier])) {
-            throw new Exception(sprintf('Invalid law: "%s"', $array['gesetz']));
-        }
+        $identifier = strtolower($data['gesetz']);
 
         # Combine everything
         return sprintf('https://dejure.org/gesetze/%s/%s',
-            $this->library[$identifier]['slug'], $array['norm'] . '.html'
+            $this->library[$identifier]['slug'], $data['norm'] . '.html'
         );
     }
 }

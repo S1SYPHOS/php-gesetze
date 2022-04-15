@@ -23,13 +23,13 @@ Upon invoking the main class, you may specify your preferred provider (or 'drive
 $object = new \S1SYPHOS\Gesetze\Gesetz('dejure');
 ```
 
-It's also possible to specify your desired order of two or more drivers as array:
+It's also possible to specify selected of two or more drivers as array:
 
 ```php
 $object = new \S1SYPHOS\Gesetze\Gesetz(['dejure', 'buzer']);
 ```
 
-**Note:** This option defaults to all available drivers, which is a good overall choice, simply because of the vast array of supported laws. Possible values are `gesetze`, `'dejure'`, `'buzer'` and `'lexparency'`.
+**Note:** This defaults to all available drivers, which is a good overall choice, simply because of the vast array of supported laws. Possible values are `gesetze`, `'dejure'`, `'buzer'` and `'lexparency'`.
 
 Out of the box, `php-gesetze` cycles through all known drivers until a match is found.
 
@@ -167,10 +167,10 @@ There are several settings you may use in order to change the behavior of the li
 
 ### `$object->drivers (array)`
 
-Associative array, holding all available drivers (already initialized), where the corresponding keys are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'`.
+Associative array, holding all available drivers (already initialized), where the corresponding keys are `'gesetze'`, `'dejure'`, `'buzer'` & `'lexparency'` (default).
 
 
-### `$object::$pattern (string)`
+### `$object->pattern (string)`
 
 The regex responsible for detecting legal norms. For reference, it amounts to this:
 

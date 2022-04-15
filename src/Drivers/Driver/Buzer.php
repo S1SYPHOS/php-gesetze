@@ -4,8 +4,6 @@ namespace S1SYPHOS\Gesetze\Drivers\Driver;
 
 use S1SYPHOS\Gesetze\Drivers\Driver;
 
-use Exception;
-
 
 /**
  * Class Buzer
@@ -35,22 +33,21 @@ class Buzer extends Driver
      *
      * Used as `href` attribute
      *
-     * @param array $array Formatted regex match
+     * @param string|array $string Matched text OR formatted regex match
      * @return string
-     * @throws \Exception
      */
-    public function buildURL(array $array): string {
-        # Get lowercase identifier for current law
-        $identifier = strtolower($array['gesetz']);
-
-        # Fail early if law is unavailable
-        if (!isset($this->library[$identifier])) {
-            throw new Exception(sprintf('Invalid law: "%s"', $array['gesetz']));
+    protected function buildURL($data): string {
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
         }
+
+        # Get lowercase identifier for current law
+        $identifier = strtolower($data['gesetz']);
 
         # Combine everything
         return sprintf('https://buzer.de/%s',
-            $this->library[$identifier]['headings'][$array['norm']]['slug']
+            $this->library[$identifier]['headings'][$data['norm']]['slug']
         );
     }
 
@@ -60,20 +57,19 @@ class Buzer extends Driver
      *
      * Used as `title` attribute
      *
-     * @param array $array Formatted regex match
-     * @param mixed $mode Mode of operation
+     * @param string|array $string Matched text OR formatted regex match
+     * @param string|null $mode Mode of operation
      * @return string
-     * @throws \Exception
      */
-    public function buildTitle(array $array, $mode = null): string
+    protected function buildTitle($data, $mode = null): string
     {
-        # Get lowercase identifier for current law
-        $identifier = strtolower($array['gesetz']);
-
-        # Fail early if law is unavailable
-        if (!isset($this->library[$identifier])) {
-            throw new Exception(sprintf('Invalid law: "%s"', $array['gesetz']));
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
         }
+
+        # Get lowercase identifier for current law
+        $identifier = strtolower($data['gesetz']);
 
         # Get data about current law
         $law = $this->library[$identifier];
@@ -87,7 +83,7 @@ class Buzer extends Driver
                 return $law['title'];
 
             case 'full':
-                return $law['headings'][$array['norm']]['text'];
+                return $law['headings'][$data['norm']]['text'];
         }
 
         return '';

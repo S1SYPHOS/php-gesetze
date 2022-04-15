@@ -19,6 +19,14 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
      */
 
     /**
+     * Instance
+     *
+     * @var \S1SYPHOS\Gesetze\Gesetz
+     */
+    private static $object;
+
+
+    /**
      * Text (with legal references)
      *
      * @var string
@@ -41,7 +49,10 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         # Setup
-        # (1) Text (with legal references)
+        # (1) Instance
+        self::$object = new Gesetz;
+
+        # (2) Text (with legal references)
         # (a) Enforce UTF-8 encoding
         $text = '<!DOCTYPE html><meta charset="UTF-8">';
 
@@ -58,7 +69,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
 
         self::$text = $text;
 
-        # (2) Text (without legal references)
+        # (3) Text (without legal references)
         # (a) Enforce UTF-8 encoding
         $text = '<!DOCTYPE html><meta charset="UTF-8">';
 
@@ -76,7 +87,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function testValidDriver(): void
+    public function testInit(): void
     {
         # Setup
         # (1) Providers
@@ -87,16 +98,17 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             'lexparency' => 'S1SYPHOS\Gesetze\Drivers\Driver\Lexparency',
         ];
 
+        # Run function #1
+        $result = new Gesetz();
+
+        # Assert result
+        $this->assertInstanceOf('S1SYPHOS\Gesetze\Gesetz', $result);
+        $this->assertEquals(array_keys($result->drivers), array_keys($drivers));
+
+        # Run function #2
         foreach ($drivers as $driver => $className) {
-            # Run function
-            $result = new Gesetz($driver);
-
             # Assert result
-            $this->assertInstanceOf('S1SYPHOS\Gesetze\Gesetz', $result);
-
-            foreach ($result->drivers as $driver => $object) {
-                $this->assertInstanceOf($drivers[$driver], $object);
-            }
+            $this->assertInstanceOf($className, $result->drivers[$driver]);
         }
     }
 
@@ -113,50 +125,19 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             ['lexparency', 'gesetze', 'dejure', 'buzer'],
         ];
 
-        # (2) Default order
-        $order = [
-            'gesetze',
-            'dejure',
-            'buzer',
-            'lexparency',
-        ];
-
         # Run function #1
-        $result1 = new Gesetz();
-
-        # Assert result
-        $this->assertEquals(array_keys($result1->drivers), $order);
-
-        # Run function #2
         $result2 = new Gesetz('lexparency');
 
         # Assert result
         $this->assertEquals(array_keys($result2->drivers), ['lexparency']);
 
         foreach ($drivers as $order) {
-            # Run function #3
+            # Run function #2
             $result3 = new Gesetz($order);
 
             # Assert result
             $this->assertEquals(array_keys($result3->drivers), $order);
         }
-    }
-
-
-    public function testDriversDuplicate(): void
-    {
-        # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
-        # (2) Providers
-        $drivers = ['buzer', 'gesetze', 'dejure', 'buzer'];
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function
-        new Gesetz($drivers);
     }
 
 
@@ -290,7 +271,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $full => $meta) {
             # Assert result
-            $this->assertEquals(Gesetz::analyze($full), $meta);
+            $this->assertEquals(self::$object->analyze($full), $meta);
         }
     }
 
@@ -308,7 +289,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $norm) {
             # Assert result
-            $this->assertEquals(Gesetz::analyze($norm), []);
+            $this->assertEquals(self::$object->analyze($norm), []);
         }
     }
 
@@ -316,9 +297,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testValidate(): void
     {
         # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
         # (1) Legal norms
         $norms = [
             '§ 433 BGB' => true,
@@ -328,7 +306,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $norm => $expected) {
             # Assert result
-            $this->assertEquals($object->validate($norm), $expected);
+            $this->assertEquals(self::$object->validate($norm), $expected);
         }
     }
 
@@ -336,10 +314,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testValidateEmpty(): void
     {
         # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
-        # (2) Norms
+        # (1) Norms
         $norms = [
             '',
             '§ 1 by itself == useless',
@@ -349,7 +324,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         # Run function
         foreach ($norms as $norm) {
             # Assert result
-            $this->assertFalse($object->validate($norm));
+            $this->assertFalse(self::$object->validate($norm));
         }
     }
 
@@ -388,10 +363,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testGesetzify(): void
     {
         # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
-        # (2) HTML document
+        # (1) HTML document
         $dom = new \DOMDocument;
 
         # Run function #1
@@ -402,7 +374,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($result1), 0);
 
         # Run function #2
-        @$dom->loadHTML($object->gesetzify(self::$text));
+        @$dom->loadHTML(self::$object->gesetzify(self::$text));
         $result2 = $dom->getElementsByTagName('a');
 
         # Assert result
@@ -413,14 +385,11 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testGesetzifyEmpty(): void
     {
         # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
-        # (2) HTML document
+        # (1) HTML document
         $dom = new \DOMDocument;
 
         # Run function
-        $result = $object->gesetzify(self::$emptyText);
+        $result = self::$object->gesetzify(self::$emptyText);
 
         # Assert result
         $this->assertEquals($result, self::$emptyText);
@@ -430,13 +399,10 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     public function testGesetzifyCallback(): void
     {
         # Setup
-        # (1) Instance
-        $object = new Gesetz();
-
-        # (2) HTML document
+        # (1) HTML document
         $dom = new \DOMDocument;
 
-        # (3) Callback function
+        # (2) Callback function
         $callback = function(array $match): string
         {
             return sprintf('<strong>%s</strong>', $match[0]);
@@ -450,7 +416,7 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($result1), 1);
 
         # Run function #2
-        @$dom->loadHTML($object->gesetzify(self::$text, $callback));
+        @$dom->loadHTML(self::$object->gesetzify(self::$text, $callback));
         $result2 = $dom->getElementsByTagName('strong');
 
         # Assert result
@@ -563,8 +529,6 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
             foreach ($attributes as $attribute => $value) {
                 $this->assertEquals($link->getAttribute($attribute), '');
             }
-
-            $this->assertEquals($link->getAttribute('target'), '_blank');
         }
 
         # Change condition `attributes`

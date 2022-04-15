@@ -2,15 +2,15 @@
 
 namespace S1SYPHOS\Gesetze\Tests\Drivers;
 
-use S1SYPHOS\Gesetze\Drivers\Drivers;
+use S1SYPHOS\Gesetze\Drivers\Factory;
 
 use Exception;
 
 
 /**
- * Class DriversTest
+ * Class FactoryTest
  *
- * Adds tests for class 'Drivers'
+ * Adds tests for class 'Factory'
  */
 class DriversTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,7 +18,7 @@ class DriversTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function testFactory(): void
+    public function testCreate(): void
     {
         # Setup
         # (1) Providers
@@ -31,7 +31,7 @@ class DriversTest extends \PHPUnit\Framework\TestCase
 
         foreach ($drivers as $driver => $className) {
             # Run function
-            $result = Drivers::factory($driver);
+            $result = Factory::create($driver);
 
             # Assert result
             $this->assertInstanceOf($className, $result);
@@ -39,12 +39,12 @@ class DriversTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testFactoryInvalid(): void
+    public function testCreateInvalid(): void
     {
         # Assert exception
         $this->expectException(Exception::class);
 
         # Run function
-        Drivers::factory('?!#@=');
+        Factory::create('?!#@=');
     }
 }

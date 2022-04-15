@@ -10,7 +10,8 @@
 
 namespace S1SYPHOS\Gesetze;
 
-use S1SYPHOS\Gesetze\Drivers\Drivers;
+use S1SYPHOS\Gesetze\Drivers\Factory;
+use S1SYPHOS\Gesetze\Traits\Regex;
 
 use Exception;
 
@@ -23,6 +24,13 @@ use Exception;
 class Gesetz
 {
     /**
+     * Traits
+     */
+
+    use Regex;
+
+
+    /**
      * Properties
      */
 
@@ -32,51 +40,6 @@ class Gesetz
      * @var array
      */
     public $drivers = [];
-
-
-    /**
-     * The regex, holding the world together in its inmost folds
-     *
-     * For reference:
-     *
-     * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?\b)/'
-     */
-    public static $pattern = ''
-        # Start
-        . '/'
-        # Section sign
-        . '(?:§+|&sect;|Art\.?|Artikel)\s*'
-        # Section ('Norm')
-        . '(\d+(?:\w\b)?)\s*'
-        # Subsection ('Absatz')
-        . '(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*'
-        # Sentence ('Satz')
-        . '(?:(?:S\.|Satz)\s*(\d+))?\s*'
-        # Number ('Nummer')
-        . '(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*'
-        # Letter ('Litera')
-        . '(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?'
-        # Character limit
-        . '.{0,10}?'
-        # Law ('Gesetz')
-        . '(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?\b)'
-        # End
-        . '/';
-
-
-    /**
-     * Names for capturing groups
-     *
-     * @var array
-     */
-    public static $groups = [
-        'norm',
-        'absatz',
-        'satz',
-        'nr',
-        'lit',
-        'gesetz',
-    ];
 
 
     /**
@@ -96,7 +59,7 @@ class Gesetz
      * 'normal' => complete law (eg 'Grundgesetz')
      * 'full'   => official heading (eg 'Art 45d Parlamentarisches Kontrollgremium')
      *
-     * @var mixed string|false
+     * @var string|false
      */
     public $title = false;
 
@@ -104,15 +67,15 @@ class Gesetz
     /**
      * Constructor
      *
-     * @param mixed $order Provider identifier
+     * @param string|array $drivers Identifiers of providers to be used
      * @return void
      * @throws \Exception
      */
-    public function __construct($order = null)
+    public function __construct($drivers = null)
     {
         # Set default order
-        if (is_null($order)) {
-            $order = [
+        if (is_null($drivers)) {
+            $drivers = [
                 'gesetze',     # 'gesetze-im-internet.de'
                 'dejure',      # 'dejure.org'
                 'buzer',       # 'buzer.de'
@@ -121,21 +84,15 @@ class Gesetz
         }
 
         # If string was passed as order ..
-        if (is_string($order)) {
+        if (is_string($drivers)) {
             # .. make it an array
-            $order = [$order];
+            $drivers = [$drivers];
         }
 
         # Loop through selected drivers
-        foreach ($order as $driver) {
-            # If added before ..
-            if (isset($this->drivers[$driver])) {
-                # .. report duplicate driver
-                throw new Exception(sprintf('Driver already loaded: "%s"', $driver));
-            }
-
-            # Initialize drivers
-            $this->drivers[$driver] = Drivers::factory($driver);
+        foreach ($drivers as $driver) {
+            # Initialize each of them
+            $this->drivers[$driver] = Factory::create($driver);
         }
     }
 
@@ -143,6 +100,105 @@ class Gesetz
     /**
      * Methods
      */
+
+    /**
+     * Validates a single legal norm (across all providers)
+     *
+     * @param string $string Legal norm
+     * @return bool Whether legal norm is valid (with regard to its 'linkability')
+     */
+    public function validate(string $string): bool
+    {
+        # Fail early when string is empty
+        if (empty($string)) {
+            return false;
+        }
+
+        # Iterate over drivers
+        foreach ($this->drivers as $driver => $object) {
+            # If legal norm checks out ..
+            if ($object->validate($string)) {
+                # .. break the loop
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Extracts legal norms as array of strings
+     *
+     * @param string $string Text
+     * @return array
+     */
+    public function extract(string $string): array
+    {
+        preg_match_all($this->pattern, $string, $matches);
+
+        return $matches[0];
+    }
+
+
+    /**
+     * Converts matched legal reference into `a` tag
+     *
+     * @param array $match Matched legal norm
+     * @return string
+     */
+    private function linkify(array $match): string
+    {
+        # Fetch extracted data
+        $data = $this->groupMatch($match);
+
+        # Iterate over drivers for each match ..
+        foreach ($this->drivers as $driver => $object) {
+            # .. blocking invalid laws & legal norms
+            if (!$object->validate($data)) {
+                continue;
+            }
+
+            # Build `a` tag attributes
+            $attributes = array_merge($this->attributes, $object->buildAttributes($data, $this->title));
+
+            # Abort the loop
+            break;
+        }
+
+        # If URL not found ..
+        if (empty($attributes['href'])) {
+            # .. return original text
+            return $match[0];
+        }
+
+        # Build `a` tag
+        # (1) Format key-value pairs
+        $attributes = array_map(function($key, $value) {
+            return sprintf('%s="%s"', $key, $value);
+        }, array_keys($attributes), array_values($attributes));
+
+        # (2) Combine everything
+        return '<a ' . implode(' ', $attributes) . '>' . $match[0] . '</a>';
+    }
+
+
+    /**
+     * Converts legal references throughout text into `a` tags
+     *
+     * @param string $string Unprocessed text
+     * @param callable $callback Callback function
+     * @return string Processed text
+     */
+    public function gesetzify(string $string, ?callable $callback = null): string
+    {
+        if (is_null($callback)) {
+            $callback = [$this, 'linkify'];
+        }
+
+        return preg_replace_callback($this->pattern, $callback, $string);
+    }
+
 
     /**
      * Converts roman numerals to arabic numerals
@@ -190,148 +246,5 @@ class Gesetz
         }
 
         return $result;
-    }
-
-
-    /**
-     * Creates match array
-     *
-     * @param string $string Legal norm
-     * @return array Formatted regex match
-     */
-    private static function groupMatch(array $match): array
-    {
-        return array_combine(self::$groups, array_slice($match, 1));
-    }
-
-
-    /**
-     * Analyzes a single legal norm
-     *
-     * @param string $string Legal norm
-     * @return array Formatted regex match
-     */
-    public static function analyze(string $string): array
-    {
-        if (preg_match(self::$pattern, $string, $matches)) {
-            return array_filter(self::groupMatch($matches));
-        }
-
-        return [];
-    }
-
-
-    /**
-     * Validates a single legal norm (across all providers)
-     *
-     * @param string $string Legal norm
-     * @return bool Whether legal norm is valid (with regard to its 'linkability')
-     */
-    public function validate(string $string): bool
-    {
-        # Fail early when string is empty
-        if (empty($string)) {
-            return false;
-        }
-
-        # Iterate over drivers
-        foreach ($this->drivers as $driver => $object) {
-            # If legal norm checks out ..
-            if ($object->validate(self::analyze($string))) {
-                # .. break the loop
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Extracts legal norms as array of strings
-     *
-     * @param string $string Text
-     * @return array
-     */
-    public function extract(string $string): array
-    {
-        preg_match_all(self::$pattern, $string, $matches);
-
-        return $matches[0];
-    }
-
-
-    /**
-     * Converts matched legal reference into `a` tag
-     *
-     * @param array $matches Matched legal norm
-     * @return string
-     */
-    private function linkify(array $matches): string
-    {
-        # Create match array, consisting of ..
-        $match = array_merge(
-            # (1) .. full match (first entry)
-            ['match' => $matches[0]],
-
-            # (2) .. combined capture group names & remaining entries
-            self::groupMatch($matches)
-        );
-
-        # Iterate over drivers for each match ..
-        foreach ($this->drivers as $driver => $object) {
-            # .. blocking invalid laws & legal norms
-            if (!$object->validate($match)) {
-                continue;
-            }
-
-            # Build `a` tag attributes
-            # (1) Set defaults
-            $attributes = $this->attributes;
-
-            # (2) Determine `href` attribute
-            $attributes['href'] = $object->buildURL($match);
-
-            # (3) Determine `title` attribute
-            $attributes['title'] = $object->buildTitle($match, $this->title);
-
-            # (4) Provide fallback for `target` attribute
-            if (!isset($attributes['target'])) {
-                $attributes['target'] = '_blank';
-            }
-
-            # Abort the loop
-            break;
-        }
-
-        if (!isset($attributes['href'])) {
-            return $matches[0];
-        }
-
-        # Build `a` tag
-        # (1) Format key-value pairs
-        $attributes = array_map(function($key, $value) {
-            return sprintf('%s="%s"', $key, $value);
-        }, array_keys($attributes), array_values($attributes));
-
-        # (2) Combine everything
-        return '<a ' . implode(' ', $attributes) . '>' . $match['match'] . '</a>';
-    }
-
-
-    /**
-     * Converts legal references throughout text into `a` tags
-     *
-     * @param string $string Unprocessed text
-     * @param callable $callback Callback function
-     * @return string Processed text
-     */
-    public function gesetzify(string $string, ?callable $callback = null): string
-    {
-        if (is_null($callback)) {
-            $callback = [$this, 'linkify'];
-        }
-
-        return preg_replace_callback(self::$pattern, $callback, $string);
     }
 }

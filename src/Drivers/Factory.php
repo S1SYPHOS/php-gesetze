@@ -6,11 +6,11 @@ use Exception;
 
 
 /**
- * Class Drivers
+ * Class Factory
  *
  * Creates driver instances
  */
-class Drivers
+class Factory
 {
     /**
      * Available drivers
@@ -36,7 +36,7 @@ class Drivers
      * @return mixed
      * @throws \Exception
      */
-    public static function factory(string $type)
+    public static function create(string $type)
     {
         # Fail early for invalid drivers
         if (!isset(static::$types[$type])) {
@@ -44,6 +44,6 @@ class Drivers
         }
 
         # Instantiate object
-        return new self::$types[$type];
+        return new static::$types[$type];
     }
 }
