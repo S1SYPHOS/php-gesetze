@@ -2,9 +2,9 @@
 /vendor
 /composer.lock
 
-# Scraping
-/laws/dejure
-/laws/gesetze
-
 # Cache
 *.cache
+
+# Pages
+.phpdoc
+/pages
