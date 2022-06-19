@@ -3,6 +3,8 @@
 
 Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
+For API documentation (powered by [phpDocumentor](https://www.phpdoc.org)), see [here](https://s1syphos.codeberg.page/php-gesetze).
+
 There's also a Python port of this library, called [`py-gesetze`](https://codeberg.org/S1SYPHOS/py-gesetze).
 
 
