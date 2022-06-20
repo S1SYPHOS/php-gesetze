@@ -1,11 +1,11 @@
 # php-gesetze
-[![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-gesetze/status.svg)](https://codeberg.org/S1SYPHOS/php-gesetze/issues)
+[![License](https://badgen.net/badge/license/GPL/blue)](https://codeberg.org/S1SYPHOS/sitzungsdienst/src/branch/main/LICENSE) [![PyPI](https://badgen.net/packagist/v/s1syphos/php-gesetze)](https://packagist.org/packages/s1syphos/php-gesetze) [![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-gesetze/status.svg)](https://codeberg.org/S1SYPHOS/php-gesetze/issues)
 
 Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
-For API documentation (powered by [phpDocumentor](https://www.phpdoc.org)), see [here](https://s1syphos.codeberg.page/php-gesetze).
-
 There's also a Python port of this library, called [`py-gesetze`](https://codeberg.org/S1SYPHOS/py-gesetze).
+
+For API documentation (powered by [phpDocumentor](https://www.phpdoc.org)), see [here](https://s1syphos.codeberg.page/php-gesetze).
 
 
 ## Installation
@@ -180,6 +180,8 @@ The regex responsible for detecting legal norms. For reference, it amounts to th
 '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?)/'
 ```
 
+**Note**: Well, more or less - for the latest revision, please refer to `src/Traits/Regex.php`!
+
 
 ### `$object->attributes (array)`
 
@@ -211,10 +213,7 @@ Controls `title` attribute:
 
 ## Credits
 
-This library is based on ..
-
-- .. an adapted (and somewhat improved) version of the [`jura_regex`](https://github.com/kiersch/jura_regex) regex package by Philipp Kiersch (originally written in Python).
-- .. an adapted (and somewhat modified) version of the [`gesetze`](https://github.com/matejgrahovac/gesetze) crawler package by Matej Grahovac (originally written in Python).
+The regular expression used in this library is based on the [`jura_regex`](https://github.com/kiersch/jura_regex) regex package by Philipp Kiersch (originally written in Python).
 
 
 ## Special Thanks
