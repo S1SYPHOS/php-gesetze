@@ -33,11 +33,22 @@ class DejureOnline extends Driver
      *
      * Used as `href` attribute
      *
-     * @param string|array $string Matched text OR formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @return string
      * @throws \Exception
      */
     protected function buildURL($data): string {
+        # Examine input
+        if (is_string($data)) {
+            $data = $this->analyze($data);
+        }
+
+        # If something goes south ..
+        if (!in_array('gesetz', array_keys($data))) {
+            # .. fail early
+            return '';
+        }
+
         # Get lowercase identifier for current law
         $identifier = strtolower($data['gesetz']);
 

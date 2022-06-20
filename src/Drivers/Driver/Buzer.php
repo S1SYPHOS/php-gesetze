@@ -33,13 +33,19 @@ class Buzer extends Driver
      *
      * Used as `href` attribute
      *
-     * @param string|array $string Matched text OR formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @return string
      */
     protected function buildURL($data): string {
         # Examine input
         if (is_string($data)) {
             $data = $this->analyze($data);
+        }
+
+        # If something goes south ..
+        if (!in_array('gesetz', array_keys($data))) {
+            # .. fail early
+            return '';
         }
 
         # Get lowercase identifier for current law
@@ -57,8 +63,8 @@ class Buzer extends Driver
      *
      * Used as `title` attribute
      *
-     * @param string|array $string Matched text OR formatted regex match
-     * @param string|null $mode Mode of operation
+     * @param string|array $data Matched text OR formatted regex match
+     * @param string|false $mode Mode of operation
      * @return string
      */
     protected function buildTitle($data, $mode = null): string
@@ -66,6 +72,12 @@ class Buzer extends Driver
         # Examine input
         if (is_string($data)) {
             $data = $this->analyze($data);
+        }
+
+        # If something goes south ..
+        if (!in_array('gesetz', array_keys($data))) {
+            # .. fail early
+            return '';
         }
 
         # Get lowercase identifier for current law

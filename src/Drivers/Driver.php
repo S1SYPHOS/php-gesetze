@@ -30,7 +30,7 @@ abstract class Driver
      *
      * @var string
      */
-    protected $identifier = null;
+    protected $identifier = '';
 
 
     /**
@@ -128,7 +128,7 @@ abstract class Driver
      *
      * Used as `title` attribute
      *
-     * @param string|array $string Matched text OR formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @param string|false $mode Mode of operation
      * @return string
      */
@@ -137,6 +137,12 @@ abstract class Driver
         # Examine input
         if (is_string($data)) {
             $data = $this->analyze($data);
+        }
+
+        # If something goes south ..
+        if (!in_array('gesetz', array_keys($data))) {
+            # .. fail early
+            return '';
         }
 
         # Get lowercase identifier for current law
@@ -164,7 +170,7 @@ abstract class Driver
     /**
      * Builds HTML attributes for corresponding legal norm
      *
-     * @param string|array $string Matched text OR formatted regex match
+     * @param string|array $data Matched text OR formatted regex match
      * @param string|false $mode Mode of operation
      * @return array
      */

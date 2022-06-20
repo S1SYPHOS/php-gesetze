@@ -15,6 +15,8 @@ trait Regex
      * For reference:
      *
      * '/(?:§+|Art\.?|Artikel)\s*(\d+(?:\w\b)?)\s*(?:(?:Abs(?:atz|\.)\s*)?((?:\d+|[XIV]+)(?:\w\b)?))?\s*(?:(?:S\.|Satz)\s*(\d+))?\s*(?:(?:Nr\.|Nummer)\s*(\d+(?:\w\b)?))?\s*(?:(?:lit\.|litera|Buchst\.|Buchstabe)\s*([a-z]?))?.{0,10}?(\b[A-Z][A-Za-z]*[A-Z](?:(?:\s|\b)[XIV]+)?\b)/'
+     *
+     * @var string
      */
     public $pattern = ''
         # Start
@@ -61,7 +63,7 @@ trait Regex
     /**
      * Creates match array
      *
-     * @param string $string Legal norm
+     * @param array $match Matched legal norm
      * @return array Formatted regex match
      */
     private function groupMatch(array $match): array

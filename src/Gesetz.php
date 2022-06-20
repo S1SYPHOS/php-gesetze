@@ -149,6 +149,9 @@ class Gesetz
      */
     private function linkify(array $match): string
     {
+        # Create data array
+        $attributes = [];
+
         # Fetch extracted data
         $data = $this->groupMatch($match);
 
@@ -164,6 +167,12 @@ class Gesetz
 
             # Abort the loop
             break;
+        }
+
+        # If something goes south ..
+        if (!in_array('href', array_keys($attributes))) {
+            # .. return original text
+            return $match[0];
         }
 
         # If URL not found ..
