@@ -10,7 +10,7 @@
 
 namespace S1SYPHOS\Gesetze;
 
-use S1SYPHOS\Gesetze\Drivers\Factory;
+use S1SYPHOS\Gesetze\Providers\Factory;
 use S1SYPHOS\Gesetze\Traits\Regex;
 
 use Exception;
@@ -39,7 +39,7 @@ class Gesetz
      *
      * @var array
      */
-    public $drivers = [];
+    public $providers = [];
 
 
     /**
@@ -53,8 +53,6 @@ class Gesetz
     /**
      * Controls `title` attribute
      *
-     * Possible values:
-     *
      * 'light'  => abbreviated law (eg 'GG')
      * 'normal' => complete law (eg 'Grundgesetz')
      * 'full'   => official heading (eg 'Art 45d Parlamentarisches Kontrollgremium')
@@ -67,15 +65,15 @@ class Gesetz
     /**
      * Constructor
      *
-     * @param string|array $drivers Identifiers of providers to be used
+     * @param string|array $providers Identifiers of providers to be used
      * @return void
      * @throws \Exception
      */
-    public function __construct($drivers = null)
+    public function __construct($providers = null)
     {
         # Set default order
-        if (is_null($drivers)) {
-            $drivers = [
+        if (is_null($providers)) {
+            $providers = [
                 'gesetze',     # 'gesetze-im-internet.de'
                 'dejure',      # 'dejure.org'
                 'buzer',       # 'buzer.de'
@@ -84,15 +82,15 @@ class Gesetz
         }
 
         # If string was passed as order ..
-        if (is_string($drivers)) {
+        if (is_string($providers)) {
             # .. make it an array
-            $drivers = [$drivers];
+            $providers = [$providers];
         }
 
-        # Loop through selected drivers
-        foreach ($drivers as $driver) {
+        # Loop through selected providers
+        foreach ($providers as $provider) {
             # Initialize each of them
-            $this->drivers[$driver] = Factory::create($driver);
+            $this->providers[$provider] = Factory::create($provider);
         }
     }
 
@@ -114,8 +112,8 @@ class Gesetz
             return false;
         }
 
-        # Iterate over drivers
-        foreach ($this->drivers as $driver => $object) {
+        # Iterate over providers
+        foreach ($this->providers as $provider => $object) {
             # If legal norm checks out ..
             if ($object->validate($string)) {
                 # .. break the loop
@@ -155,8 +153,8 @@ class Gesetz
         # Fetch extracted data
         $data = $this->groupMatch($match);
 
-        # Iterate over drivers for each match ..
-        foreach ($this->drivers as $driver => $object) {
+        # Iterate over providers for each match ..
+        foreach ($this->providers as $provider => $object) {
             # .. blocking invalid laws & legal norms
             if (!$object->validate($data)) {
                 continue;

@@ -91,11 +91,11 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
     {
         # Setup
         # (1) Providers
-        $drivers = [
-            'gesetze'    => 'S1SYPHOS\Gesetze\Drivers\Driver\GesetzeImInternet',
-            'dejure'     => 'S1SYPHOS\Gesetze\Drivers\Driver\DejureOnline',
-            'buzer'      => 'S1SYPHOS\Gesetze\Drivers\Driver\Buzer',
-            'lexparency' => 'S1SYPHOS\Gesetze\Drivers\Driver\Lexparency',
+        $providers = [
+            'gesetze'    => 'S1SYPHOS\Gesetze\Providers\Provider\GesetzeImInternet',
+            'dejure'     => 'S1SYPHOS\Gesetze\Providers\Provider\DejureOnline',
+            'buzer'      => 'S1SYPHOS\Gesetze\Providers\Provider\Buzer',
+            'lexparency' => 'S1SYPHOS\Gesetze\Providers\Provider\Lexparency',
         ];
 
         # Run function #1
@@ -103,21 +103,21 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertInstanceOf('S1SYPHOS\Gesetze\Gesetz', $result);
-        $this->assertEquals(array_keys($result->drivers), array_keys($drivers));
+        $this->assertEquals(array_keys($result->providers), array_keys($providers));
 
         # Run function #2
-        foreach ($drivers as $driver => $className) {
+        foreach ($providers as $provider => $className) {
             # Assert result
-            $this->assertInstanceOf($className, $result->drivers[$driver]);
+            $this->assertInstanceOf($className, $result->providers[$provider]);
         }
     }
 
 
-    public function testDriverOrder(): void
+    public function testProviderOrder(): void
     {
         # Setup
         # (1) Providers
-        $drivers = [
+        $providers = [
             # (a) Array with single entry
             ['gesetze'],
 
@@ -129,14 +129,14 @@ class GesetzTest extends \PHPUnit\Framework\TestCase
         $result2 = new Gesetz('lexparency');
 
         # Assert result
-        $this->assertEquals(array_keys($result2->drivers), ['lexparency']);
+        $this->assertEquals(array_keys($result2->providers), ['lexparency']);
 
-        foreach ($drivers as $order) {
+        foreach ($providers as $order) {
             # Run function #2
             $result3 = new Gesetz($order);
 
             # Assert result
-            $this->assertEquals(array_keys($result3->drivers), $order);
+            $this->assertEquals(array_keys($result3->providers), $order);
         }
     }
 
