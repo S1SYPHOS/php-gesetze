@@ -1,5 +1,5 @@
 # php-gesetze
-[![License](https://badgen.net/badge/license/GPL/blue)](https://codeberg.org/S1SYPHOS/sitzungsdienst/src/branch/main/LICENSE) [![PyPI](https://badgen.net/packagist/v/s1syphos/php-gesetze)](https://packagist.org/packages/s1syphos/php-gesetze) [![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-gesetze/status.svg)](https://codeberg.org/S1SYPHOS/php-gesetze/issues)
+[![License](https://badgen.net/badge/license/GPL/blue)](https://codeberg.org/S1SYPHOS/php-gesetze/src/branch/main/LICENSE) [![Packagist](https://badgen.net/packagist/v/s1syphos/php-gesetze)](https://packagist.org/packages/s1syphos/php-gesetze) [![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-gesetze/status.svg)](https://codeberg.org/S1SYPHOS/php-gesetze/issues)
 
 Linking german legal norms, dependency-free & GDPR-friendly. `php-gesetze` automatically transforms legal references into `a` tags - batteries included.
 
