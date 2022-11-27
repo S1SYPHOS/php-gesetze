@@ -3,7 +3,7 @@
     "description": "Linking german legal norms, dependency-free & GDPR-friendly",
     "type": "library",
     "license": "GPL-3.0",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "keywords": [
         "bjm",
         "law",
